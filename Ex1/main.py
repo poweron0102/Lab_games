@@ -5,4 +5,5 @@ window.set_title("Nathan Pinheiro")
 
 
 while True:
-    pass
+    window.set_background_color((255, 0, 0))  # Vermelho
+    window.update()
