@@ -25,27 +25,25 @@ class Player:
     def movimento(self):
         # Movimento WASD  -=-=-=-=-=-=-=-=-=-=-=-=-=-=
         keys = pg.key.get_pressed()
-        self.dx = 0
-        self.dy = 0
+        dx = 0
+        dy = 0
 
         if keys[pg.K_w]:
-            self.dx += self.speed * math.cos(self.ang)
-            self.dy += self.speed * math.sin(self.ang)
+            dx += self.speed * math.cos(self.ang)
+            dy += self.speed * math.sin(self.ang)
         if keys[pg.K_d]:
-            self.dx += self.speed * math.cos(self.ang + (math.pi/2))
-            self.dy += self.speed * math.sin(self.ang + (math.pi/2))
+            dx += self.speed * math.cos(self.ang + (math.pi/2))
+            dy += self.speed * math.sin(self.ang + (math.pi/2))
         if keys[pg.K_a]:
-            self.dx += (self.speed * math.sin(self.ang + (math.pi))) * -1
-            self.dy += self.speed * math.cos(self.ang + (math.pi))
+            dx += (self.speed * math.sin(self.ang + (math.pi))) * -1
+            dy += self.speed * math.cos(self.ang + (math.pi))
         if keys[pg.K_s]:
-            self.dx += self.speed * math.sin(self.ang + (3*math.pi/2))
-            self.dy += (self.speed * math.cos(self.ang + (3*math.pi/2))) * -1
+            dx += self.speed * math.sin(self.ang + (3*math.pi/2))
+            dy += (self.speed * math.cos(self.ang + (3*math.pi/2))) * -1
         # Movimento WASD  -=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
         # Outros -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         if keys[pg.K_l]:
-            #self.game.map = Map(self.game, 1)
-            #self.game.action.Next_map
             self.game.action.Lose()
 
         if keys[pg.K_m]:
@@ -77,11 +75,11 @@ class Player:
             self.ang += 2 * math.pi
         # Movimento Mouse -=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-        if not self.game.map.is_wall(self.x + self.dx + Player_size * sig(self.dx), self.y):
-            self.x += self.dx
+        if not self.game.map.is_wall(self.x + dx + Player_size * sig(dx), self.y):
+            self.x += dx
 
-        if not self.game.map.is_wall(self.x, self.y + self.dy + Player_size * sig(self.dy)):
-            self.y += self.dy
+        if not self.game.map.is_wall(self.x, self.y + dy + Player_size * sig(dy)):
+            self.y += dy
 
         #self.locate = (self.x, self.y)
 
