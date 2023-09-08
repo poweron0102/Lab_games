@@ -23,5 +23,5 @@ class InGame:
         #    10
         #)
         self.word_map.draw()
-        self.player.draw()
+        #self.player.draw()
 

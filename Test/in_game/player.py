@@ -10,13 +10,13 @@ class Player:
         self.x = 70
         self.y = -110
         self.z = 20
-
-        self.speed = 1
-
-        self.open_map = False
-
         self.ang = 0
         self.look = 0
+
+        self.speed = 1
+        self.height = 10
+
+        self.open_map = False
 
         self.game = game
 

@@ -35,5 +35,6 @@ class GameRunner:
 
 
 if __name__ == '__main__':
+    #SCREEN = pg.display.set_mode(SCREEN_RESOLUTION)
     game = GameRunner()
     game.run()
