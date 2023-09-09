@@ -108,7 +108,7 @@ class Ray_tracer:
         # print(self.rays)
 
     def draw_rays(self, screen):
-        # self.ray_size()
+        self.ray_size()
         # self.ray_size_fast()
 
         # print(self.rays)
@@ -118,14 +118,34 @@ class Ray_tracer:
         self.rays.clear()
 
     def draw(self, screen):
-        # self.ray_size()
-        self.ray_size_fast()
-        # for a in self.rays: print(a)
+        self.ray_size()
+        # self.ray_size_fast()
+        #for a in self.rays: print(a)
         # exit(0)
 
         for ray_id, ray_point, ray_dist in self.rays:
-            line_high = (Tile_size * Screen_distance / (ray_dist + 0.000001)) * self.game.map.wall_higth(ray_point[0],
-                                                                                                         ray_point[1])
+            line_high = (Tile_size * Screen_distance / (ray_dist + 0.000001)) * self.game.map.wall_high(ray_point[0],
+                                                                                                        ray_point[1])
+
+            offset = ray_point[0] % Tile_size
+            if offset == 0:
+                offset = ray_point[1] % Tile_size
+            offset /= Tile_size
+
+            if self.game.map.tile_texture(ray_point[0], ray_point[1]):
+                coluna = self.game.map.tile_texture(ray_point[0], ray_point[1]).subsurface(
+                    Texture_Res * offset,
+                    0,
+                    1,
+                    Texture_Res
+                )
+                coluna = pg.transform.scale(coluna, (SCALE, line_high))
+
+                #if ((RES[1] / 2) - line_high) / 2 > 1:
+                #    print(ray_id * SCALE)
+                #    print(int(((RES[1] / 2) - line_high) / 2))
+                screen.blit(coluna, (ray_id * SCALE, ((RES[1] / 2) - line_high) / 2))
+                continue
 
             pg.draw.rect(screen,  # Tela
                          self.game.map.tile_color(ray_point[0], ray_point[1]),  # color

@@ -1,5 +1,7 @@
 import pygame as pg
 import numpy as np
+from pygame import Surface
+
 from settings import *
 
 Tiles = [
@@ -78,20 +80,23 @@ class Map:
         else:
             return 0
 
-    def is_wall(self, x, y):
+    def is_wall(self, x, y) -> bool:
         return Tiles[self.get_tile(x, y)][1]
-
-    def is_render(self, x, y):
-        return Tiles[self.get_tile(x, y)][5]
-
-    def wall_higth(self, x, y):
-        return Tiles[self.get_tile(x, y)][4]
 
     def tile_color(self, x, y):
         return Tiles[self.get_tile(x, y)][2]
 
     def tile_action(self, x, y):
         return Tiles[self.get_tile(x, y)][3]
+
+    def wall_high(self, x, y):
+        return Tiles[self.get_tile(x, y)][4]
+
+    def is_render(self, x, y) -> bool:
+        return Tiles[self.get_tile(x, y)][5]
+
+    def tile_texture(self, x, y) -> Surface | None:
+        return Tiles[self.get_tile(x, y)][6]
 
     def draw(self, screen):
         tamanho = (Mine_Map_zoom * len(self.world_map[0]), Mine_Map_zoom * len(self.world_map))

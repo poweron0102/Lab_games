@@ -13,6 +13,7 @@ Default_angulo = 0
 
 NumThreads = 2
 
+Texture_Res = 128
 Tile_size = 64
 SCALE = 2
 FOV = 60

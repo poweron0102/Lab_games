@@ -119,8 +119,8 @@ class Ray_tracer:
         self.rays_size()
         const_screan = RES[0] // (FOV * Rays_per_angle)
         for ray_atual, ray in enumerate(self.rays):
-            line_higth = (Tile_size * Screen_distance / (ray[1] + 0.000001)) * self.game.map.wall_higth(ray[0][0],
-                                                                                                        ray[0][1])
+            line_higth = (Tile_size * Screen_distance / (ray[1] + 0.000001)) * self.game.map.wall_high(ray[0][0],
+                                                                                                       ray[0][1])
             # if line_higth > RES[1]: line_higth = RES[1] # Limitar o tamanho da parede
 
             # Dezenhar o chão

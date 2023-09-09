@@ -58,6 +58,7 @@ fn cast(
     py.allow_threads(|| {
         let mut handles = vec![];
         for i in 0..num_threads {
+            let mut rays_in = Vec::with_capacity((screen_width/SCALE)/num_threads);
             let rays = rays.clone();
             let render = render.clone();
             let map = map.clone();
@@ -168,15 +169,14 @@ fn cast(
                     size = dist_v;
                 }
 
-                rays.lock().unwrap().push((cont, point, f32::cos(player_angle - angle_ray) * size));
+                rays_in.push((cont, point, f32::cos(player_angle - angle_ray) * size));
                 angle_ray += angle_per_cont;
                 angle_ray = normalize_angle(angle_ray);
             }
-
+            rays.lock().unwrap().append(&mut rays_in);
             });
             handles.push(handle);
         }
-
         for handle in handles {
             handle.join().unwrap();
         }
