@@ -24,7 +24,7 @@ class Game:
     def update(self):
         pg.display.flip()
         self.clock.tick(FPS)
-        pg.display.set_caption(f'Jogo de Nathan   FPS: {self.clock.get_fps() :.1f}')
+        pg.display.set_caption(f'Jogo de célula   FPS: {self.clock.get_fps() :.1f}')
 
     def draw(self):
         self.screen.fill([0, 0, 0])  # preto
