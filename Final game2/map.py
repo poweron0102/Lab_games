@@ -6,7 +6,7 @@ from settings import *
 
 Tiles = [
     # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_higth': 1, 'render': False}
-    ['', False, [0, 0, 0, 0], None, 1, False, None],
+    ['', False, [255, 255, 255], None, 1, False, None],
     ['', True, 'darkgray', None, 1, True, 'quartz_bricks.png'],
     ['', True, 'red', None, 1, True, None],
     ['', True, 'Purple', None, 1, True, None],
@@ -84,7 +84,10 @@ class Map:
         return Tiles[self.get_tile(x, y)][1]
 
     def tile_color(self, x, y):
-        return Tiles[self.get_tile(x, y)][2]
+        id = self.get_tile(x, y)
+        if id:
+            return Tiles[self.get_tile(x, y)][2]
+        return [0, 0, 0]
 
     def tile_action(self, x, y):
         return Tiles[self.get_tile(x, y)][3]
@@ -106,4 +109,4 @@ class Map:
             for x, tile in enumerate(linha):
                 xr = int((x * Mine_Map_zoom) + Mini_Map_position[0])
 
-                pg.draw.rect(screen, Tiles[self.world_map[y][x]][2], (xr, yr, Mine_Map_zoom, Mine_Map_zoom), 5)
+                pg.draw.rect(screen, Tiles[self.world_map[y][x]][2], (xr, yr, Mine_Map_zoom, Mine_Map_zoom), 20)
