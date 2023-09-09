@@ -86,13 +86,14 @@ class Ray_tracer:
                 ponto = ray_posiV
                 tamanho = distV
 
-            self.rays.append((ponto, tamanho * math.cos(self.game.player.ang - angle_ray)))
+            self.rays.append((contador, ponto, tamanho * math.cos(self.game.player.ang - angle_ray)))
 
-            angle_ray += math.radians(FOV)/(RES[0]//SCALE)
+            angle_ray += math.radians(FOV) / (RES[0] // SCALE)
             angle_ray = angle_to_fist(angle_ray)
 
     def ray_size_fast(self):
         self.rays = fast_ray_cast.cast(
+            NumThreads,
             self.game.player.x,
             self.game.player.y,
             self.game.player.ang,
@@ -104,32 +105,34 @@ class Ray_tracer:
             [1, 2, 3],
             self.game.map.world_map
         )
-        #print(self.rays)
+        # print(self.rays)
 
     def draw_rays(self, screen):
-        #self.ray_size()
-        self.ray_size_fast()
+        # self.ray_size()
+        # self.ray_size_fast()
 
         # print(self.rays)
         for ray in self.rays:
-            pg.draw.line(screen, 'blue', (self.game.player.x, self.game.player.y), ray[0])
+            pg.draw.line(screen, 'blue', (self.game.player.x, self.game.player.y), ray[1])
             # print(ray)
-        del self.rays
+        self.rays.clear()
 
     def draw(self, screen):
-        #self.ray_size()
+        # self.ray_size()
         self.ray_size_fast()
+        # for a in self.rays: print(a)
+        # exit(0)
 
-        for ray_atual, ray in enumerate(self.rays):
-            line_higth = (Tile_size * Screen_distance / (ray[1] + 0.000001)) * self.game.map.wall_higth(ray[0][0],
-                                                                                                        ray[0][1])
+        for ray_id, ray_point, ray_dist in self.rays:
+            line_high = (Tile_size * Screen_distance / (ray_dist + 0.000001)) * self.game.map.wall_higth(ray_point[0],
+                                                                                                         ray_point[1])
 
             pg.draw.rect(screen,  # Tela
-                         self.game.map.tile_color(ray[0][0], ray[0][1]),  # color
+                         self.game.map.tile_color(ray_point[0], ray_point[1]),  # color
                          (
-                             ray_atual * SCALE,
-                             ((RES[1] / 2) - line_higth) / 2,
+                             ray_id * SCALE,
+                             ((RES[1] / 2) - line_high) / 2,
                              SCALE,
-                             line_higth
+                             line_high
                          )
                          )

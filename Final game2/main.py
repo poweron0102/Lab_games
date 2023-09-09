@@ -1,6 +1,6 @@
 import sys
 from player import *
-from ray_tracer import *
+from ray_caster import *
 from actions import *
 
 

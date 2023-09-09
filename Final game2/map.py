@@ -4,15 +4,22 @@ from settings import *
 
 Tiles = [
     # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_higth': 1, 'render': False}
-    ['', False, [0, 0, 0, 0], False, 1, False],
-    ['', True, 'darkgray', False, 1, True],
-    ['', True, 'red', False, 1, True],
-    ['', True, 'Purple', False, 1, True],
-    ['', False, 'green', 'Next map', 1, False],
-    ['', False, '#c92a2a', 'Lose', 1, False],
+    ['', False, [0, 0, 0, 0], None, 1, False, None],
+    ['', True, 'darkgray', None, 1, True, 'quartz_bricks.png'],
+    ['', True, 'red', None, 1, True, None],
+    ['', True, 'Purple', None, 1, True, None],
+    ['', False, 'green', 'Next map', 1, False, None],
+    ['', False, '#c92a2a', 'Lose', 1, False, None],
 ]
 
-world_map = [
+
+def update_tiles():
+    for tile in Tiles:
+        if type(tile[6]) == str:
+            tile[6] = pg.image.load(f'assets/walls/{tile[6]}').convert_alpha()
+
+
+world_map = np.array([
     [  # Mapa 0
         [0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -53,7 +60,7 @@ world_map = [
         [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
     ]
-]
+])
 
 
 class Map:
@@ -61,6 +68,7 @@ class Map:
         self.game = game
         self.world_map = world_map[mapa]
         self.mapa_atual = mapa
+        update_tiles()
 
     def get_tile(self, x, y):
         x = int(x // Tile_size)
@@ -87,7 +95,7 @@ class Map:
 
     def draw(self, screen):
         tamanho = (Mine_Map_zoom * len(self.world_map[0]), Mine_Map_zoom * len(self.world_map))
-        pg.draw.rect(self.game.screen, [0, 0, 0, 0], (Mini_Map_position, tamanho))
+        pg.draw.rect(self.game.screen, [220, 220, 220], (Mini_Map_position, tamanho))
         for y, linha in enumerate(self.world_map):
             yr = int((y * Mine_Map_zoom) + Mini_Map_position[1])
             for x, tile in enumerate(linha):
