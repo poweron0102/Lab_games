@@ -14,6 +14,7 @@ class Ray_tracer:
         playerY = self.game.player.y
         player_ang = self.game.player.ang
         offsetX = offsetY = 0
+        look = 0
         self.rays.clear()
         angle_ray = angle_to_fist(player_ang - math.radians(FOV) / 2)
 
@@ -26,11 +27,13 @@ class Ray_tracer:
                 rayX = playerX + ((playerY - rayY) * aTan)
                 offsetY = -Tile_size
                 offsetX = -offsetY * aTan
+                look_ns = 1
             elif angle_ray < math.pi:  # looking down
                 rayY = (playerY // Tile_size) * Tile_size + Tile_size
                 rayX = playerX + ((playerY - rayY) * aTan)
                 offsetY = Tile_size
                 offsetX = -offsetY * aTan
+                look_ns = 0
             else:  # if angle_ray == 0 or angle_ray == math.pi:
                 rayY = playerY
                 rayX = playerX
@@ -55,11 +58,13 @@ class Ray_tracer:
                 rayY = playerY + ((playerX - rayX) * aTan)
                 offsetX = Tile_size
                 offsetY = -offsetX * aTan
+                look_ew = 3
             elif angle_ray > math.pi / 2 and angle_ray < math.pi * 3 / 2:  # looking left
                 rayX = (playerX // Tile_size) * Tile_size - 0.0001
                 rayY = playerY + ((playerX - rayX) * aTan)
                 offsetX = -Tile_size
                 offsetY = -offsetX * aTan
+                look_ew = 2
             else:
                 rayY = playerY
                 rayX = playerX
@@ -82,11 +87,13 @@ class Ray_tracer:
             if distH < distV:
                 ponto = ray_posiH
                 tamanho = distH
+                look = look_ns
             else:
                 ponto = ray_posiV
                 tamanho = distV
+                look = look_ew
 
-            self.rays.append((contador, ponto, tamanho * math.cos(self.game.player.ang - angle_ray)))
+            self.rays.append((contador, ponto, tamanho * math.cos(self.game.player.ang - angle_ray), look))
 
             angle_ray += math.radians(FOV) / (RES[0] // SCALE)
             angle_ray = angle_to_fist(angle_ray)
@@ -118,32 +125,33 @@ class Ray_tracer:
         self.rays.clear()
 
     def draw(self, screen):
-        self.ray_size()
-        # self.ray_size_fast()
-        #for a in self.rays: print(a)
+        # self.ray_size()
+        self.ray_size_fast()
+        # for a in self.rays: print(a)
         # exit(0)
 
-        for ray_id, ray_point, ray_dist in self.rays:
+        for ray_id, ray_point, ray_dist, look in self.rays:
             line_high = (Tile_size * Screen_distance / (ray_dist + 0.000001)) * self.game.map.wall_high(ray_point[0],
                                                                                                         ray_point[1])
 
-            offset = ray_point[0] % Tile_size
-            if offset == 0:
-                offset = ray_point[1] % Tile_size
-            offset /= Tile_size
-
             if self.game.map.tile_texture(ray_point[0], ray_point[1]):
-                coluna = self.game.map.tile_texture(ray_point[0], ray_point[1]).subsurface(
-                    Texture_Res * offset,
+                if look == 0:  # Norte
+                    offset = Tile_size - (ray_point[0] % Tile_size)
+                elif look == 1:  # Sul
+                    offset = ray_point[0] % Tile_size
+                elif look == 2:  # Lest
+                    offset = Tile_size - (ray_point[1] % Tile_size)
+                else:  # Oeste
+                    offset = ray_point[1] % Tile_size
+
+                coluna = self.game.map.tile_texture(ray_point[0], ray_point[1])[look].subsurface(
+                    Texture_Res * offset / Tile_size,
                     0,
                     1,
                     Texture_Res
                 )
                 coluna = pg.transform.scale(coluna, (SCALE, line_high))
 
-                #if ((RES[1] / 2) - line_high) / 2 > 1:
-                #    print(ray_id * SCALE)
-                #    print(int(((RES[1] / 2) - line_high) / 2))
                 screen.blit(coluna, (ray_id * SCALE, ((RES[1] / 2) - line_high) / 2))
                 continue
 

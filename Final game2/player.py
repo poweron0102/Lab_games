@@ -56,12 +56,6 @@ class Player:
         if mouse_pos[0] > RES[0] - 10:
             pg.mouse.set_pos(30, mouse_pos[1])
 
-        # if mouse_pos[1] < 10:
-        #    pg.mouse.set_pos(mouse_pos[0], RES[1]-30)
-
-        # if mouse_pos[1] > RES[1] - 10:
-        #    pg.mouse.set_pos(mouse_pos[0], 30)
-
         mouse_move = pg.mouse.get_rel()
         self.ang += mouse_move[0] * Mouse_sens
         if self.ang > 2 * math.pi:
@@ -70,10 +64,10 @@ class Player:
             self.ang += 2 * math.pi
         # Movimento Mouse -=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-        if not self.game.map.is_wall(self.x + dx + Player_size * sig(dx), self.y):
+        if not self.game.map.is_wall(self.x + dx * Player_size, self.y):
             self.x += dx
 
-        if not self.game.map.is_wall(self.x, self.y + dy + Player_size * sig(dy)):
+        if not self.game.map.is_wall(self.x, self.y + dy * Player_size):
             self.y += dy
 
     def calc_linha(self, x, y, tamanho):

@@ -4,6 +4,7 @@ use std::ops::Index;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::Thread;
+use crate::Look::{East, North, South, West};
 
 fn normalize_angle(angle: f32) -> f32 {
     let mut result = angle;
@@ -18,6 +19,24 @@ fn normalize_angle(angle: f32) -> f32 {
 
 fn distance(pnt1: (f32, f32), pnt2: (f32, f32)) -> f32 {
     f32::sqrt((pnt1.0 - pnt2.0).powi(2) + (pnt1.1 - pnt2.1).powi(2))
+}
+
+#[derive(Clone, Copy)]
+enum Look {
+    North = 0,
+    South = 1,
+    East = 2,
+    West = 3
+}
+impl Look {
+    fn int(&self) -> u8 {
+        match self {
+            North => { 0 }
+            South => { 1 }
+            East =>  { 2 }
+            West =>  { 3 }
+        }
+    }
 }
 
 ///     num_threads: usize,
@@ -45,8 +64,8 @@ fn cast(
     RENDER_DIST:usize,
     render: Vec<u16>,
     map: Vec<Vec<u16>>
-) -> PyResult<Vec<(usize, (f32, f32), f32)>> {
-    let rays: Arc<Mutex<Vec<(usize, (f32, f32), f32)>>> = Arc::new(Mutex::new(
+) -> PyResult<Vec<(usize, (f32, f32), f32, u8)>> {
+    let rays: Arc<Mutex<Vec<(usize, (f32, f32), f32, u8)>>> = Arc::new(Mutex::new(
         Vec::with_capacity(screen_width/SCALE)
     ));
     let render = Arc::new(render);
@@ -68,6 +87,10 @@ fn cast(
                 let sum = angle_per_cont * (((screen_width/SCALE)/num_threads) as f32) * i as f32;
                 let mut angle_ray = normalize_angle(angle_start + sum);
 
+                let mut look_ns = North;
+                let mut look_ew = East;
+                let mut look = North;
+
                 for cont in (((screen_width/SCALE)/num_threads)*i)..(((screen_width/SCALE)/num_threads)*(i+1)) {
                 // Calc horizontal -=-=-=-=-=-=-=--=-=-=-=-
                 let ray_posi_h: (f32, f32);
@@ -79,16 +102,18 @@ fn cast(
                     let mut offset_y: f32 = 0.0;
                     let mut rendist:  usize = 0;
 
-                    if angle_ray > PI { // loking up
+                    if angle_ray > PI { // looking up
                         ray_y = (((playerY / TILE_SIZE) as i32) as f32) * TILE_SIZE - 0.0001;
                         ray_x = playerX + ((playerY - ray_y) * aTan);
                         offset_y = -TILE_SIZE;
                         offset_x = -offset_y * aTan;
-                    } else if angle_ray < PI { // loking down
+                        look_ns = South;
+                    } else if angle_ray < PI { // looking down
                         ray_y = (((playerY / TILE_SIZE) as i32) as f32) * TILE_SIZE + TILE_SIZE;
                         ray_x = playerX + ((playerY - ray_y) * aTan);
                         offset_y = TILE_SIZE;
                         offset_x = -offset_y * aTan;
+                        look_ns = North;
                     } else {
                         ray_y = playerY;
                         ray_x = playerX;
@@ -122,16 +147,18 @@ fn cast(
                     let mut offset_y: f32 = 0.0;
                     let mut rendist: usize = 0;
 
-                    if angle_ray < PI/2.0 || angle_ray > 3.0*PI/2.0 { // loking rigth
+                    if angle_ray < PI/2.0 || angle_ray > 3.0*PI/2.0 { // looking rigth
                         ray_x = (((playerX / TILE_SIZE) as i32) as f32) * TILE_SIZE + TILE_SIZE;
                         ray_y = playerY + ((playerX - ray_x) * aTan);
                         offset_x = TILE_SIZE;
                         offset_y = -offset_x * aTan;
-                    } else if angle_ray > PI/2.0 && angle_ray < 3.0*PI/2.0 { //loking left
+                        look_ew = West;
+                    } else if angle_ray > PI/2.0 && angle_ray < 3.0*PI/2.0 { // looking left
                         ray_x = (((playerX / TILE_SIZE) as i32) as f32) * TILE_SIZE - 0.0001;
                         ray_y = playerY + ((playerX - ray_x) * aTan);
                         offset_x = -TILE_SIZE;
                         offset_y = -offset_x * aTan;
+                        look_ew = East;
                     } else {
                         ray_y = playerY;
                         ray_x = playerX;
@@ -164,12 +191,14 @@ fn cast(
                 if dist_h < dist_v {
                     point = ray_posi_h;
                     size = dist_h;
+                    look = look_ns;
                 }else {
                     point = ray_posi_v;
                     size = dist_v;
+                    look = look_ew;
                 }
 
-                rays_in.push((cont, point, f32::cos(player_angle - angle_ray) * size));
+                rays_in.push((cont, point, f32::cos(player_angle - angle_ray) * size, look.int()));
                 angle_ray += angle_per_cont;
                 angle_ray = normalize_angle(angle_ray);
             }

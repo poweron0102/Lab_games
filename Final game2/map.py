@@ -7,10 +7,10 @@ from settings import *
 Tiles = [
     # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_higth': 1, 'render': False}
     ['', False, [255, 255, 255], None, 1, False, None],
-    ['', True, 'darkgray', None, 1, True, 'quartz_bricks.png'],
+    ['', True, 'darkgray', None, 1, True, 'quartz_bricks'],
     ['', True, 'red', None, 1, True, None],
-    ['', True, 'Purple', None, 1, True, None],
-    ['', False, 'green', 'Next map', 1, False, None],
+    ['', True, 'Purple', None, 1, True, 'text'],
+    ['', False, 'green', 'Next_map', 1, False, None],
     ['', False, '#c92a2a', 'Lose', 1, False, None],
 ]
 
@@ -18,7 +18,11 @@ Tiles = [
 def update_tiles():
     for tile in Tiles:
         if type(tile[6]) == str:
-            tile[6] = pg.image.load(f'assets/walls/{tile[6]}').convert_alpha()
+            to_load = tile[6].split()
+            tile[6] = [pg.image.load(f'assets/walls/{to_load[0]}.png').convert()] * 4
+            for id, texture_name in enumerate(to_load[1:]):
+                if texture_name == 'none': continue
+                tile[6][id + 1] = pg.image.load(f'assets/walls/{texture_name}.png').convert()
 
 
 world_map = np.array([

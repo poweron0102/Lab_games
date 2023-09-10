@@ -1,11 +1,10 @@
 import math
 
 RES = (1280, 720)  # 1280, 720   1366, 736   1260, 736
-# RES = (1280, 720)
 FPS = 60
 
 Player_speed = 5
-Player_size = 20
+Player_size = 4
 Mouse_sens = 0.005
 
 Posicao_inicial = (50, 50)

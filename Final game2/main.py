@@ -4,7 +4,7 @@ from ray_caster import *
 from actions import *
 
 
-class Game:
+class InGame:
     def __init__(self):
         pg.init()
         pg.font.init()
@@ -13,7 +13,6 @@ class Game:
         self.new_game()
         self.font_Blackout = pg.font.Font('fonts/Blackout.otf', 250)
         # pg.mouse.set_visible(False)
-        # self.sky = pg.image.load('assets/sky/sky.png').convert()
 
     def new_game(self):
         self.map = Map(self)
@@ -24,7 +23,7 @@ class Game:
     def update(self):
         pg.display.flip()
         self.clock.tick(FPS)
-        pg.display.set_caption(f'Jogo de célula   FPS: {self.clock.get_fps() :.1f}')
+        pg.display.set_caption(f'Cellular Odyssey   FPS: {self.clock.get_fps() :.1f}')
 
     def draw(self):
         self.screen.fill([0, 0, 0])  # preto
@@ -53,5 +52,5 @@ class Game:
 
 
 if __name__ == '__main__':
-    game = Game()
+    game = InGame()
     game.run()
