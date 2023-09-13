@@ -64,8 +64,8 @@ fn cast(
     RENDER_DIST:usize,
     render: Vec<u16>,
     map: Vec<Vec<u16>>
-) -> PyResult<Vec<(usize, (f32, f32), f32, u8)>> {
-    let rays: Arc<Mutex<Vec<(usize, (f32, f32), f32, u8)>>> = Arc::new(Mutex::new(
+) -> PyResult<Vec<(u8, (f32, usize, (f32, f32), u8))>> {
+    let rays: Arc<Mutex<Vec<(u8, (f32, usize, (f32, f32), u8))>>> = Arc::new(Mutex::new(
         Vec::with_capacity(screen_width/SCALE)
     ));
     let render = Arc::new(render);
@@ -198,7 +198,7 @@ fn cast(
                     look = look_ew;
                 }
 
-                rays_in.push((cont, point, f32::cos(player_angle - angle_ray) * size, look.int()));
+                rays_in.push((0, (f32::cos(player_angle - angle_ray) * size, cont, point, look.int())));
                 angle_ray += angle_per_cont;
                 angle_ray = normalize_angle(angle_ray);
             }

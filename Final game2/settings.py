@@ -1,5 +1,7 @@
 import math
 
+RUST = True
+
 RES = (1280, 720)  # 1280, 720   1366, 736   1260, 736
 FPS = 60
 
@@ -16,7 +18,9 @@ Texture_Res = 128
 Tile_size = 64
 SCALE = 2
 FOV = 60
+
 Render_dist = 20
+Sprite_Ren_dist = 2048
+
 Mine_Map_zoom = 24
 Mini_Map_position = (2 * Mine_Map_zoom, RES[1] - 13 * Mine_Map_zoom)
-Screen_distance = (RES[0] / 2) / math.tan(math.radians(FOV/2))

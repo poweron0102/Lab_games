@@ -1,7 +1,6 @@
 import pygame as pg
 import numpy as np
 from pygame import Surface
-
 from settings import *
 
 Tiles = [
@@ -9,7 +8,7 @@ Tiles = [
     ['', False, [255, 255, 255], None, 1, False, None],
     ['', True, 'darkgray', None, 1, True, 'quartz_bricks'],
     ['', True, 'red', None, 1, True, None],
-    ['', True, 'Purple', None, 1, True, 'text'],
+    ['', True, 'Purple', None, 1, True, 'n s l w'],
     ['', False, 'green', 'Next_map', 1, False, None],
     ['', False, '#c92a2a', 'Lose', 1, False, None],
 ]
@@ -104,13 +103,3 @@ class Map:
 
     def tile_texture(self, x, y) -> Surface | None:
         return Tiles[self.get_tile(x, y)][6]
-
-    def draw(self, screen):
-        tamanho = (Mine_Map_zoom * len(self.world_map[0]), Mine_Map_zoom * len(self.world_map))
-        pg.draw.rect(self.game.screen, [220, 220, 220], (Mini_Map_position, tamanho))
-        for y, linha in enumerate(self.world_map):
-            yr = int((y * Mine_Map_zoom) + Mini_Map_position[1])
-            for x, tile in enumerate(linha):
-                xr = int((x * Mine_Map_zoom) + Mini_Map_position[0])
-
-                pg.draw.rect(screen, Tiles[self.world_map[y][x]][2], (xr, yr, Mine_Map_zoom, Mine_Map_zoom), 20)

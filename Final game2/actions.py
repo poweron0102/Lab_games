@@ -14,13 +14,16 @@ class Actions:
     def __init__(self, game):
         self.game = game
 
-    def actions(self):
+    def do_action(self, action):
+        ACTIONS[action](self.game)
+
+    def update(self):
         playerX = self.game.player.x
         playerY = self.game.player.y
-        self.action = self.game.map.tile_action(playerX, playerY)
-        if self.action:
+        action = self.game.map.tile_action(playerX, playerY)
+        if action:
             # print(self.action)
-            ACTIONS[self.action](self.game)
+            ACTIONS[action](self.game)
 
 
 @add_action

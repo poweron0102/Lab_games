@@ -4,102 +4,99 @@ import fast_ray_cast
 import math
 
 
-class Ray_tracer:
+class RayCaster:
     def __init__(self, game):
-        self.rays = []
         self.game = game
 
     def ray_size(self):
-        playerX = self.game.player.x
-        playerY = self.game.player.y
+        player_x = self.game.player.x
+        player_y = self.game.player.y
         player_ang = self.game.player.ang
-        offsetX = offsetY = 0
-        look = 0
-        self.rays.clear()
+        offset_x = offset_y = 0
         angle_ray = angle_to_fist(player_ang - math.radians(FOV) / 2)
 
         for contador in range(RES[0] // SCALE):
             # Calculo horizontal -=-=-=-=-=-=-=--=-=-=-=-
             rendist = 0
-            aTan = -1 / (math.tan(angle_ray) + 0.00001)
+            a_tan = -1 / (math.tan(angle_ray) + 0.00001)
             if angle_ray > math.pi:  # looking up
-                rayY = (playerY // Tile_size) * Tile_size - 0.0001
-                rayX = playerX + ((playerY - rayY) * aTan)
-                offsetY = -Tile_size
-                offsetX = -offsetY * aTan
+                ray_y = (player_y // Tile_size) * Tile_size - 0.0001
+                ray_x = player_x + ((player_y - ray_y) * a_tan)
+                offset_y = -Tile_size
+                offset_x = -offset_y * a_tan
                 look_ns = 1
             elif angle_ray < math.pi:  # looking down
-                rayY = (playerY // Tile_size) * Tile_size + Tile_size
-                rayX = playerX + ((playerY - rayY) * aTan)
-                offsetY = Tile_size
-                offsetX = -offsetY * aTan
+                ray_y = (player_y // Tile_size) * Tile_size + Tile_size
+                ray_x = player_x + ((player_y - ray_y) * a_tan)
+                offset_y = Tile_size
+                offset_x = -offset_y * a_tan
                 look_ns = 0
             else:  # if angle_ray == 0 or angle_ray == math.pi:
-                rayY = playerY
-                rayX = playerX
+                ray_y = player_y
+                ray_x = player_x
                 rendist = Render_dist
 
             while rendist < Render_dist:
-                if Tile_size < rayX < RES[0] + Tile_size and -Tile_size < rayY < RES[1] + Tile_size:
-                    if self.game.map.is_render(rayX, rayY):
+                if Tile_size < ray_x < RES[0] + Tile_size and -Tile_size < ray_y < RES[1] + Tile_size:
+                    if self.game.map.is_render(ray_x, ray_y):
                         break
                 # else:
-                rayX += offsetX
-                rayY += offsetY
+                ray_x += offset_x
+                ray_y += offset_y
                 rendist += 1
 
-            ray_posiH = (rayX, rayY)
+            ray_posi_h = (ray_x, ray_y)
 
             # Calculo vertical -=-=-=-=-=-=-=-=-=-=
             rendist = 0
-            aTan = -math.tan(angle_ray)
+            a_tan = -math.tan(angle_ray)
             if angle_ray < math.pi / 2 or angle_ray > math.pi * 3 / 2:  # looking right
-                rayX = (playerX // Tile_size) * Tile_size + Tile_size
-                rayY = playerY + ((playerX - rayX) * aTan)
-                offsetX = Tile_size
-                offsetY = -offsetX * aTan
+                ray_x = (player_x // Tile_size) * Tile_size + Tile_size
+                ray_y = player_y + ((player_x - ray_x) * a_tan)
+                offset_x = Tile_size
+                offset_y = -offset_x * a_tan
                 look_ew = 3
-            elif angle_ray > math.pi / 2 and angle_ray < math.pi * 3 / 2:  # looking left
-                rayX = (playerX // Tile_size) * Tile_size - 0.0001
-                rayY = playerY + ((playerX - rayX) * aTan)
-                offsetX = -Tile_size
-                offsetY = -offsetX * aTan
+            elif math.pi / 2 < angle_ray < math.pi * 3 / 2:  # looking left
+                ray_x = (player_x // Tile_size) * Tile_size - 0.0001
+                ray_y = player_y + ((player_x - ray_x) * a_tan)
+                offset_x = -Tile_size
+                offset_y = -offset_x * a_tan
                 look_ew = 2
             else:
-                rayY = playerY
-                rayX = playerX
+                ray_y = player_y
+                ray_x = player_x
                 rendist = Render_dist
 
             while rendist < Render_dist:
-                if Tile_size < rayX < RES[0] + Tile_size and -Tile_size < rayY < RES[1] + Tile_size:
-                    if self.game.map.is_render(rayX, rayY):
+                if Tile_size < ray_x < RES[0] + Tile_size and -Tile_size < ray_y < RES[1] + Tile_size:
+                    if self.game.map.is_render(ray_x, ray_y):
                         break
                 # else:
-                rayX += offsetX
-                rayY += offsetY
+                ray_x += offset_x
+                ray_y += offset_y
                 rendist += 1
 
-            ray_posiV = (rayX, rayY)
+            ray_posi_v = (ray_x, ray_y)
 
-            distH = distancia((playerX, playerY), ray_posiH)
-            distV = distancia((playerX, playerY), ray_posiV)
+            dist_h = distancia((player_x, player_y), ray_posi_h)
+            dist_v = distancia((player_x, player_y), ray_posi_v)
 
-            if distH < distV:
-                ponto = ray_posiH
-                tamanho = distH
+            if dist_h < dist_v:
+                ponto = ray_posi_h
+                tamanho = dist_h
                 look = look_ns
             else:
-                ponto = ray_posiV
-                tamanho = distV
+                ponto = ray_posi_v
+                tamanho = dist_v
                 look = look_ew
 
-            self.rays.append((contador, ponto, tamanho * math.cos(self.game.player.ang - angle_ray), look))
+            self.game.drawer.to_draw.append((0, (tamanho * math.cos(self.game.player.ang - angle_ray), contador, ponto, look)))
 
             angle_ray += math.radians(FOV) / (RES[0] // SCALE)
             angle_ray = angle_to_fist(angle_ray)
 
     def ray_size_fast(self):
-        self.rays = fast_ray_cast.cast(
+        self.game.drawer.to_draw.extend(fast_ray_cast.cast(
             NumThreads,
             self.game.player.x,
             self.game.player.y,
@@ -111,56 +108,23 @@ class Ray_tracer:
             Render_dist,
             [1, 2, 3],
             self.game.map.world_map
-        )
+        ))
         # print(self.rays)
 
-    def draw_rays(self, screen):
-        self.ray_size()
-        # self.ray_size_fast()
+    def update(self):
+        if RUST:
+            self.ray_size_fast()
+        else:
+            self.ray_size()
 
-        # print(self.rays)
-        for ray in self.rays:
-            pg.draw.line(screen, 'blue', (self.game.player.x, self.game.player.y), ray[1])
-            # print(ray)
-        self.rays.clear()
+    #def draw_rays(self, screen):
+    #    self.ray_size()
+    #    # self.ray_size_fast()
+    #
+    #    # print(self.rays)
+    #    for ray in self.rays:
+    #        pg.draw.line(screen, 'blue', (self.game.player.x, self.game.player.y), ray[1])
+    #        # print(ray)
+    #    self.rays.clear()
 
-    def draw(self, screen):
-        # self.ray_size()
-        self.ray_size_fast()
-        # for a in self.rays: print(a)
-        # exit(0)
 
-        for ray_id, ray_point, ray_dist, look in self.rays:
-            line_high = (Tile_size * Screen_distance / (ray_dist + 0.000001)) * self.game.map.wall_high(ray_point[0],
-                                                                                                        ray_point[1])
-
-            if self.game.map.tile_texture(ray_point[0], ray_point[1]):
-                if look == 0:  # Norte
-                    offset = Tile_size - (ray_point[0] % Tile_size)
-                elif look == 1:  # Sul
-                    offset = ray_point[0] % Tile_size
-                elif look == 2:  # Lest
-                    offset = Tile_size - (ray_point[1] % Tile_size)
-                else:  # Oeste
-                    offset = ray_point[1] % Tile_size
-
-                coluna = self.game.map.tile_texture(ray_point[0], ray_point[1])[look].subsurface(
-                    Texture_Res * offset / Tile_size,
-                    0,
-                    1,
-                    Texture_Res
-                )
-                coluna = pg.transform.scale(coluna, (SCALE, line_high))
-
-                screen.blit(coluna, (ray_id * SCALE, ((RES[1] / 2) - line_high) / 2))
-                continue
-
-            pg.draw.rect(screen,  # Tela
-                         self.game.map.tile_color(ray_point[0], ray_point[1]),  # color
-                         (
-                             ray_id * SCALE,
-                             ((RES[1] / 2) - line_high) / 2,
-                             SCALE,
-                             line_high
-                         )
-                         )

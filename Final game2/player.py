@@ -1,8 +1,9 @@
-#from settings import *
-#import pygame as pg
+# from settings import *
+# import pygame as pg
 from map import *
 import math
 from functions import sig
+
 
 class Player:
     def __init__(self, game):
@@ -17,7 +18,7 @@ class Player:
 
         self.game = game
 
-    def movimento(self):
+    def update(self):
         # Movimento WASD  -=-=-=-=-=-=-=-=-=-=-=-=-=-=
         keys = pg.key.get_pressed()
         dx = 0
@@ -70,21 +71,14 @@ class Player:
         if not self.game.map.is_wall(self.x, self.y + dy * Player_size):
             self.y += dy
 
-    def calc_linha(self, x, y, tamanho):
-        return ((x + (tamanho * math.cos(self.ang)), y + (tamanho * math.sin(self.ang))))
+        if self.open_map:
+            self.game.drawer.to_draw.extend([
+                (2, self.game.map),
+                (1, self)
+            ])
 
+    def calc_linha(self, x, y, tamanho):
+        return x + (tamanho * math.cos(self.ang)), y + (tamanho * math.sin(self.ang))
 
     def calc_linha_centro(self, tamanho):
-        return ((RES[0]/2 + (tamanho * math.cos(self.ang)), RES[1]/2 + (tamanho * math.sin(self.ang))))
-
-
-    def draw(self, screen):
-        x = (Mine_Map_zoom * self.x / Tile_size) + Mini_Map_position[0]
-        y = (Mine_Map_zoom * self.y / Tile_size) + Mini_Map_position[1]
-        pg.draw.circle(screen, 'Green', (x, y), Mine_Map_zoom / 4)
-        pg.draw.line(screen, 'Pink', (x, y), self.calc_linha(x, y, Mine_Map_zoom / 5), 2)
-
-
-    def draw_centro(self):
-        pg.draw.circle(self.game.screen, 'Green', (RES[0]/2, RES[1]/2), 15)
-        pg.draw.line(self.game.screen, 'Pink', (RES[0]/2, RES[1]/2), self.calc_linha_centro(50), 3)
+        return RES[0] / 2 + (tamanho * math.cos(self.ang)), RES[1] / 2 + (tamanho * math.sin(self.ang))
