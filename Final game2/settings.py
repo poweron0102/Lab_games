@@ -1,11 +1,14 @@
 import math
+import pygame as pg
 
 RUST = True
+
+
 
 RES = (1280, 720)  # 1280, 720   1366, 736   1260, 736
 FPS = 60
 
-Player_speed = 5
+Player_speed = 200
 Player_size = 4
 Mouse_sens = 0.005
 

@@ -13,6 +13,7 @@ class Player:
         self.speed = Player_speed
 
         self.open_map = False
+        self.interact = False
 
         self.ang = math.radians(Default_angulo)
 
@@ -23,24 +24,30 @@ class Player:
         keys = pg.key.get_pressed()
         dx = 0
         dy = 0
+        speed = self.speed * self.game.delta_time
 
         if keys[pg.K_w]:
-            dx += self.speed * math.cos(self.ang)
-            dy += self.speed * math.sin(self.ang)
+            dx += speed * math.cos(self.ang)
+            dy += speed * math.sin(self.ang)
         if keys[pg.K_d]:
-            dx += self.speed * math.cos(self.ang + (math.pi / 2))
-            dy += self.speed * math.sin(self.ang + (math.pi / 2))
+            dx += speed * math.cos(self.ang + (math.pi / 2))
+            dy += speed * math.sin(self.ang + (math.pi / 2))
         if keys[pg.K_a]:
-            dx += (self.speed * math.sin(self.ang + math.pi)) * -1
-            dy += self.speed * math.cos(self.ang + math.pi)
+            dx += (speed * math.sin(self.ang + math.pi)) * -1
+            dy += speed * math.cos(self.ang + math.pi)
         if keys[pg.K_s]:
-            dx += self.speed * math.sin(self.ang + (3 * math.pi / 2))
-            dy += (self.speed * math.cos(self.ang + (3 * math.pi / 2))) * -1
+            dx += speed * math.sin(self.ang + (3 * math.pi / 2))
+            dy += (speed * math.cos(self.ang + (3 * math.pi / 2))) * -1
         # Movimento WASD  -=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
         # Outros -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         if keys[pg.K_l]:
             self.game.action.Lose()
+
+        if keys[pg.K_e]:
+            self.interact = True
+        else:
+            self.interact = False
 
         if keys[pg.K_m]:
             if self.open_map:

@@ -114,3 +114,10 @@ def sprite(item, screen, game):
         screen_x,
         ((RES[1] - high * height_shift) / 2)
     ))
+
+
+@add_draw_overwrite
+def dialogue(item, screen, game):
+    img, x, y = item
+
+    screen.blit(img, (x, y))
