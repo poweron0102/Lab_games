@@ -34,8 +34,9 @@ class InGame:
         self.action = Actions(self)
         self.drawer = Drawer(self)
 
-        self.plaqueta = Sprite(self, 'platelet', 545, 610, )
-        self.dig = Dialogue(5, "Com licença, me desculpe, mas nos estamos fazendo uma construção.", "platelet")
+        self.plaqueta = Sprite(self, 'platelet', 545, 610, action='construction')
+        self.dialogue_handler = DialogueHandler(self)
+        #self.dig = Dialogue(5, "Com licença, me desculpe, mas nos estamos fazendo uma construção.", "platelet")
 
     def update(self):
         pg.display.flip()
@@ -54,7 +55,7 @@ class InGame:
             self.ray_caster.update()
 
             self.plaqueta.update()
-            if self.dig: self.dig.update(game)
+            self.dialogue_handler.update()
 
             self.drawer.update()
 

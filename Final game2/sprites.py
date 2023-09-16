@@ -5,7 +5,7 @@ from settings import *
 
 
 class Sprite:
-    def __init__(self, game, name, x, y, scale=0.5, shift=0.07):
+    def __init__(self, game, name, x, y, scale=0.5, shift=0.07, action=None):
         self.game = game
         self.player = game.player
 
@@ -24,6 +24,7 @@ class Sprite:
 
         self.scale = scale
         self.height_shift = shift
+        self.action = action
 
     def update(self):
         dx = self.x - self.player.x
@@ -43,5 +44,8 @@ class Sprite:
         if -self.width/2 < self.screen_x < RES[0] + (self.width/2) and view_dist > 1:
             item = view_dist, self.scale, self.image, self.height, self.screen_x, self.height_shift
             self.game.drawer.to_draw.append((3, item))
+
+        if self.action:
+            self.game.action.do_action(self.action, self)
 
 
