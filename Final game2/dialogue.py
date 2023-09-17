@@ -1,4 +1,6 @@
 import pygame as pg
+from pygame import SurfaceType
+
 from settings import *
 
 
@@ -19,10 +21,10 @@ class Dialogue:
         self.passed_time = 0
         self.max_time = time * 1000
 
-        self.dialogue = dialogue.split()
-        self.is_line2 = False
-        self.falado_line1 = ''
-        self.falado_line2 = ''
+        self.dialogue: list[str | None] = dialogue.split()
+        self.current_line = 0
+        self.falado_line: list[str] = ['']
+        self.text_imgs: list[None | SurfaceType] = [None]
 
         self.final_img = None
 
@@ -39,20 +41,26 @@ class Dialogue:
             if current_dialogue := self.dialogue[
                 int(len(self.dialogue) * (self.passed_time / self.max_time))
             ]:
-                if self.is_line2:
-                    self.falado_line2 += current_dialogue + ' '
-                else:
-                    self.falado_line1 += current_dialogue + ' '
+                self.falado_line[self.current_line] += current_dialogue + ' '
 
                 self.dialogue[int(len(self.dialogue) * (self.passed_time / self.max_time))] = None
 
-                if self.font.size(self.falado_line1)[0] > 890:
-                    self.is_line2 = True
+                font_size = self.font.size(self.falado_line[self.current_line])
+                if font_size[0] > 890:
+                    self.current_line += 1
+                    self.text_imgs.append(None)
+                    self.falado_line.append("")
 
-                img_text1 = self.font.render(self.falado_line1, False, [0, 0, 0], None)
-                img_text2 = self.font.render(self.falado_line2, False, [0, 0, 0], None)
+                self.text_imgs[self.current_line] = self.font.render(
+                    self.falado_line[self.current_line],
+                    False,
+                    [0, 0, 0],
+                    None
+                )
+
                 self.final_img = self.image.copy()
-                self.final_img.blits(((img_text1, (158, 46)), (img_text2, (158, 118))))
+                for i, text_img in enumerate(self.text_imgs):
+                    self.final_img.blit(text_img, (158, 46 + font_size[1]*i))
 
             game.drawer.to_draw.append((4, (self.final_img, self.frame_x, self.frame_y)))
 

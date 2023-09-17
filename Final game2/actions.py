@@ -53,8 +53,26 @@ def construction(game, *args):
         game.dialogue_handler.add(
             Dialogue(
                 7,
-                "Com licença, me desculpe, mas nos estamos fazendo uma construção.",
+                "Oh, i'm really sorry. but we are doing some construction.",
                 "platelet",
                 audio='construcao'
             )
         )
+        game.dialogue_handler.add(
+            Dialogue(
+                2,
+                "No way we can snappy by?",
+                "ae3803pla",
+                audio='jeitodepassar'
+            )
+        )
+        game.dialogue_handler.add(
+            Dialogue(
+                10,
+                "No way at all. You see, what happened was there as a bit of trouble so construction get delayed.\
+                 I gest the delivery people had made a big mistake.",
+                "platelet",
+                audio='dellead'
+            )
+        )
+        args[0][0].action = None
