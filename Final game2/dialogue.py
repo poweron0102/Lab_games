@@ -46,7 +46,7 @@ class Dialogue:
                 self.dialogue[int(len(self.dialogue) * (self.passed_time / self.max_time))] = None
 
                 font_size = self.font.size(self.falado_line[self.current_line])
-                if font_size[0] > 890:
+                if font_size[0] > 1100:
                     self.current_line += 1
                     self.text_imgs.append(None)
                     self.falado_line.append("")
