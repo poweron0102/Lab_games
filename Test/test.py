@@ -1,81 +1,80 @@
-print("""
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+import pygame
+import math
 
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+# Configurações da janela
+WIDTH, HEIGHT = 800, 600
+HALF_WIDTH, HALF_HEIGHT = WIDTH // 2, HEIGHT // 2
+FOV = math.pi / 3  # Campo de visão (60 graus)
+DIST_PROJ_PLANE = (WIDTH / 2) / math.tan(FOV / 2)
 
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW@=***********=#WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+# Inicialização do Pygame
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
 
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWW#********************=@WWWWWWWWWWWWWWWWWWWWWWWWWWW
+# Mapa do jogo (um exemplo simples)
+mapa = [
+    "#################",
+    "#...............#",
+    "#.......#########",
+    "#...............#",
+    "#.......###.....#",
+    "#.###...........#",
+    "#...............#",
+    "#################",
+]
 
-WWWWWWWWWWWWWWWWWWWWWWWWWWW=********==========*******=@WWWWWWWWWWWWWWWWWWWWWWWW
+# Função para desenhar o chão e o teto
+def draw_ceiling_and_floor():
+    for x in range(WIDTH):
+        # Ângulo do raio lançado
+        ray_angle = (player_angle - FOV / 2) + (x / WIDTH) * FOV
 
-WWWWWWWWWWWWWWWWWWWWWWWWW=******===================*****@WWWWWWWWWWWWWWWWWWWWWW
+        for y in range(HALF_HEIGHT, HEIGHT):
+            # Altura da linha em relação ao plano de projeção
+            line_height = HEIGHT / ((y - HALF_HEIGHT) + 0.00000001)
 
-WWWWWWWWWWWWWWWWWWWWWWW#******======#==*=####=======*+***=@@WWWWWWWWWWWWWWWWWWW
+            # Posição no mapa correspondente ao raio
+            map_x = int(player_x + line_height * math.cos(ray_angle))
+            map_y = int(player_y + line_height * math.sin(ray_angle))
 
-WWWWWWWWWWWWWWWWWWWWWW******==####*++++**########=*..:-:***=@WWWWWWWWWWWWWWWWWW
+            # Cor do chão e do teto (substitua isso pela textura desejada)
+            if 0 <= map_x < len(mapa) and 0 <= map_y < len(mapa[0]):
+                if mapa[map_x][map_y] == "#":
+                    color = (0, 0, 0)  # Cor do chão
+                else:
+                    color = (100, 100, 100)  # Cor do teto
+            else:
+                color = (255, 255, 255)  # Cor padrão para fora do mapa
 
-WWWWWWWWWWWWWWWWWWWW#***==*===####+++++**#########=:----*****#@WWWWWWWWWWWWWWWW
+            # Desenhe a linha no chão e no teto
+            screen.set_at((x, y), color)
 
-WWWWWWWWWWWWWWWWWWW=****=====####=*++*=############========***#WWWWWWWWWWWWWWWW
+# Variáveis do jogador
+player_x, player_y = 5, 4
+player_angle = math.pi
 
-WWWWWWWWWWWWWWWWWW#*****=*==#########################========**WWWWWWWWWWWWWWWW
+# Loop principal do jogo
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-WWWWWWWWWWW=#WWWWW**==#=**=############################=======*@WWWWWWWWWWWWWWW
+    # Limpe a tela
+    player_x += 0.1
 
-WWWWWWWWWW=+@WWWWW*======#####################**=########======@WWWWWWWWWWWWWWW
+    pygame.display.set_caption(f'Cellular Odyssey   FPS: {clock.get_fps() :.1f}')
 
-WWWWWWWWWW=+@WWWWW#=====########++*#@#########:::*#######=====@@WWWWWWWWWWWWWWW
+    screen.fill((0, 0, 0))
 
-WWWWWWWWWW=*+@@WWWW#===##=#####+:::#=#######=*::::+####=**+=#@WWWWWWWWWWWWWWWWW
+    # Desenhe o chão e o teto
+    draw_ceiling_and_floor()
 
-WWWWWWWWWWW#=*+=@@@@#==+++####+:::::=+*@@@#+*:::::::====*+:+@WWWWWWWWWWWWWWWWWW
+    # Atualize a tela
+    pygame.display.flip()
 
-WWWWWWWWWWWWW@#====#@@@**+====::*+=@@=::=#+:+@@#@@@-*=**+=*+@WWWWWWWWWWWWWWWWWW
+    # Controle de FPS
+    clock.tick(60)
 
-WWWWWWWWWWWWWWWWWWWWWWW**+==**-:#+------------------+==*+==+#WWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWW**+*===----------------------===**==+@WWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWW#=+*===*.---------------------==*==@=@WWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWW==+*=*.-.-------------------:=====@@@WWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWW@=#===+...-----:****--------*=#@=@@WWWWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWWW@@@##==:...----+++-------+##@@@@@WWWWWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWWW@W@@@@@@@#+-.---------*#@@@@@@@@@@WWWWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW@@@@@#=+++++++@@@@@@@@WWWWWWWWWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW####=::::::*###=#@WWWWWWWWWWWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW@####=:-::----:######@@WWWWWWWWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWWWWWW#=**=#=##+::-----::*##=#=**=@@@WWWWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWWW@******#**=##*-------*##=**=******@@WWWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWW@******=***=@##########@#=**********@@WWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWWW=**********=#####@@@#####=**********=@WWWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWW@*=********==#############=*********=*@@WWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWW#*=********==#############==********=*#@WWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWWW#*==*==##=*=##############==####=**==**#@WWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWW@=**==*****==###############=******==***#WWWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWW#***=#*****==###############=******===**#@WWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWWW=*==*=*****==###@@#########==******====*=@WWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWW@***===*****==####@@@#######==******===**=@WWWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWWW=****=#*****==#####@@@@@####==******==****#@WWWWWWWWWWWWWW
-
-WWWWWWWWWWWWWWWWWWWW@========****==##############==*****====#==#@@WWWWWWWWWWWWW
-""")
+pygame.quit()

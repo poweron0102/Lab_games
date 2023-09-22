@@ -16,7 +16,7 @@ class Sprite:
 
         self.width = self.image.get_width()
         self.height = self.image.get_height()
-        self.image_ratio = self.width / self.height
+        # self.image_ratio = self.width / self.height
 
         self.dist = 1
         self.delta_ang = 1
