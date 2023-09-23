@@ -1,4 +1,6 @@
+import numpy as np
 import pygame as pg
+from numba import njit
 from settings import *
 from map import Tiles
 
@@ -121,3 +123,22 @@ def dialogue(item, screen, game):
     img, x, y = item
 
     screen.blit(img, (x, y))
+
+
+@add_draw
+@njit()
+def floor(item, screen, game):
+    buffer = np.zeros((RES[0], RES[1], 4), dtype=np.uint8)
+
+    for id_x in range(RES[0] // SCALE):
+        ray_angle = np.deg2rad(id_x / (RES[0]/FOV) - FOV//2)
+        sin, cos = np.sin(ray_angle), np.cos(ray_angle)
+
+        for id_y in range((RES[1]/2) / SCALE):
+            n = (RES[1]/2) / SCALE - id_y
+
+            player_x = n * cos
+            player_y = n * sin
+
+
+

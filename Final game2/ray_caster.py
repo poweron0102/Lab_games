@@ -1,5 +1,6 @@
 from map import *
 from functions import *
+#from numba import njit
 import fast_ray_cast
 import math
 
@@ -8,6 +9,7 @@ class RayCaster:
     def __init__(self, game):
         self.game = game
 
+    #@njit()
     def ray_size(self):
         player_x = self.game.player.x
         player_y = self.game.player.y

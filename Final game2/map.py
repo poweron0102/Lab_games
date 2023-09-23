@@ -4,7 +4,7 @@ from pygame import Surface
 from settings import *
 
 Tiles = [
-    # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_higth': 1, 'render': False}
+    # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_high': 1, 'render': False}
     ['', False, [255, 255, 255], None, 1, False, None],
     ['', True, 'darkgray', None, 1, True, 'quartz_bricks'],
     ['', True, 'red', None, 1, True, None],
