@@ -47,12 +47,12 @@ class Drawer:
         self.to_draw.clear()
 
 
+@njit()
 def render_line(ray_dist, ray_id, ray_point, look, tile_texture, screen):
     line_high = Tile_size * RES[0] / ray_dist
-    # if line_high > 4000: line_high = 4000  # <-- A gambiarra
     line_offset = (RES[1] - line_high) / 2
 
-    if tile_texture:
+    if tile_texture is not None:
         if look == 0:  # Norte
             offset = Tile_size - (ray_point[0] % Tile_size)
         elif look == 1:  # Sul
@@ -62,22 +62,27 @@ def render_line(ray_dist, ray_id, ray_point, look, tile_texture, screen):
         else:  # Oeste
             offset = ray_point[1] % Tile_size
 
-        for id_y in range():
-            pass
+        alt_pos = np.abs(line_offset) if line_offset < 0 else 0
+        alt_size = line_high if line_high < RES[1] else RES[1]
+        for id_y in range(int(line_offset + alt_pos), int(alt_size)):
+            for id_x in range(SCALE):
+                # print(f"x:{int(Texture_Res * offset / Tile_size)}   y:{int(id_y/line_high * Texture_Res)}")
+                screen[ray_id + id_x][id_y] = tile_texture[int(Texture_Res * offset / Tile_size)][int(id_y/line_high * Texture_Res)]
 
-        coluna = tile_texture.subsurface(
-            Texture_Res * offset / Tile_size,
-            0,
-            1,
-            Texture_Res
-        )
-        coluna = pg.transform.scale(coluna, (SCALE, line_high))
-
-        screen.blit(coluna, (ray_id * SCALE, line_offset))
 
 
 @add_draw
 def ray_cast(item, screen, game):
+    ray_dist, ray_id, ray_point, look = item
+    if game.map.tile_texture(ray_point[0], ray_point[1]):
+        tile_texture = pg.surfarray.pixels3d(game.map.tile_texture(ray_point[0], ray_point[1])[look])
+    else:
+        tile_texture = None
+
+    render_line(ray_dist, ray_id, ray_point, look, tile_texture, pg.surfarray.pixels3d(screen))
+
+
+    """
     ray_dist, ray_id, ray_point, look = item
     line_high = Tile_size * RES[0] / ray_dist
     if line_high > 4000: line_high = 4000  # <-- A gambiarra
@@ -113,6 +118,7 @@ def ray_cast(item, screen, game):
                      line_high
                  )
                  )
+    """
 
 
 @add_draw_overwrite
