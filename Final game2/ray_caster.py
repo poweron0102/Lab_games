@@ -3,9 +3,11 @@ from numba import njit
 from map import *
 from functions import *
 import numpy as np
-#from numba import njit
+# from numba import njit
 import fast_ray_cast
-import math
+
+
+# import math
 
 
 @njit()
@@ -21,13 +23,13 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
         # Calculo horizontal -=-=-=-=-=-=-=--=-=-=-=-
         rendist = 0
         a_tan = -1 / (np.tan(angle_ray) + 0.00001)
-        if angle_ray > math.pi:  # looking up
+        if angle_ray > np.pi:  # looking up
             ray_y = (player_y // Tile_size) * Tile_size - 0.0001
             ray_x = player_x + ((player_y - ray_y) * a_tan)
             offset_y = -Tile_size
             offset_x = -offset_y * a_tan
             look_ns = 1
-        elif angle_ray < math.pi:  # looking down
+        elif angle_ray < np.pi:  # looking down
             ray_y = (player_y // Tile_size) * Tile_size + Tile_size
             ray_x = player_x + ((player_y - ray_y) * a_tan)
             offset_y = Tile_size
@@ -54,14 +56,14 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
 
         # Calculo vertical -=-=-=-=-=-=-=-=-=-=
         rendist = 0
-        a_tan = -math.tan(angle_ray)
-        if angle_ray < math.pi / 2 or angle_ray > math.pi * 3 / 2:  # looking right
+        a_tan = -np.tan(angle_ray)
+        if angle_ray < np.pi / 2 or angle_ray > np.pi * 3 / 2:  # looking right
             ray_x = (player_x // Tile_size) * Tile_size + Tile_size
             ray_y = player_y + ((player_x - ray_x) * a_tan)
             offset_x = Tile_size
             offset_y = -offset_x * a_tan
             look_ew = 3
-        elif math.pi / 2 < angle_ray < math.pi * 3 / 2:  # looking left
+        elif np.pi / 2 < angle_ray < np.pi * 3 / 2:  # looking left
             ray_x = (player_x // Tile_size) * Tile_size - 0.0001
             ray_y = player_y + ((player_x - ray_x) * a_tan)
             offset_x = -Tile_size
@@ -107,6 +109,35 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
     return rays
 
 
+"""
+@njit()
+def cast_floor(player_x, player_y, player_ang, world_floor):
+    buffer = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
+
+    for id_x in range(RenderWidth):
+        ray_angle = player_ang + np.deg2rad(id_x / (RenderWidth / FOV) - HalfFOV)
+        sin, cos = np.sin(ray_angle), np.cos(ray_angle)
+        fish = np.cos(np.deg2rad(id_x / (RenderWidth / FOV) - HalfFOV))
+
+        for id_y in range(HalfRenderHeight):
+            n = Tile_size * (HalfRenderHeight / (HalfRenderHeight - id_y+1)) / fish
+
+            ray_x = player_x + (n * cos)
+            ray_y = player_y + (n * sin)
+
+            y = int(ray_y // Tile_size)
+            if 0 <= y < len(world_floor):
+                x = int(ray_x // Tile_size)
+                if 0 <= x < len(world_floor[y]):
+                    if world_floor[y][x] == 1:
+                        buffer[id_x][RenderHeight - id_y - 1] = [0, 255, 0]
+                    else:
+                        buffer[id_x][RenderHeight - id_y - 1] = [0, 0, 0]
+
+    return buffer
+"""
+
+
 class RayCaster:
     def __init__(self, game):
         self.game = game
@@ -128,12 +159,26 @@ class RayCaster:
         # print(self.rays)
 
     def ray_size_python(self):
+
         self.game.drawer.to_draw.extend(cast_walls(
             self.game.player.x,
             self.game.player.y,
             self.game.player.ang,
             self.game.map.world_map,
-        ))
+        )
+        )
+
+        """
+        self.game.drawer.to_draw.append(
+            (5, cast_floor(
+                self.game.player.x,
+                self.game.player.y,
+                self.game.player.ang,
+                self.game.map.world_floor,
+            )
+             )
+        )
+        """
 
     def update(self):
         if RUST:
@@ -141,7 +186,7 @@ class RayCaster:
         else:
             self.ray_size_python()
 
-    #def draw_rays(self, screen):
+    # def draw_rays(self, screen):
     #    self.ray_size()
     #    # self.ray_size_fast()
     #
@@ -150,5 +195,3 @@ class RayCaster:
     #        pg.draw.line(screen, 'blue', (self.game.player.x, self.game.player.y), ray[1])
     #        # print(ray)
     #    self.rays.clear()
-
-

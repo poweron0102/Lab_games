@@ -1,15 +1,21 @@
 import numpy as np
 import pygame as pg
-from numba import njit
+from numba import njit, jit
 from settings import *
 from map import Tiles
 
 Draw_functions = []
 Overwrites = []
+Underwrites = []
 
 
 def add_draw_overwrite(func):
     Overwrites.append(len(Draw_functions))
+    Draw_functions.append(func)
+
+
+def add_draw_underwrite(func):
+    Underwrites.append(len(Draw_functions))
     Draw_functions.append(func)
 
 
@@ -21,6 +27,8 @@ def draw_order(to_draw):
     func_id, item = to_draw
     if func_id in Overwrites:
         return 0
+    if func_id in Underwrites:
+        return 9999999999999
     return item[0]
 
 
@@ -37,6 +45,35 @@ class Drawer:
         for func_id, item in self.to_draw:
             Draw_functions[func_id](item, self.screen, self.game)
         self.to_draw.clear()
+
+
+def render_line(ray_dist, ray_id, ray_point, look, tile_texture, screen):
+    line_high = Tile_size * RES[0] / ray_dist
+    # if line_high > 4000: line_high = 4000  # <-- A gambiarra
+    line_offset = (RES[1] - line_high) / 2
+
+    if tile_texture:
+        if look == 0:  # Norte
+            offset = Tile_size - (ray_point[0] % Tile_size)
+        elif look == 1:  # Sul
+            offset = ray_point[0] % Tile_size
+        elif look == 2:  # Lest
+            offset = Tile_size - (ray_point[1] % Tile_size)
+        else:  # Oeste
+            offset = ray_point[1] % Tile_size
+
+        for id_y in range():
+            pass
+
+        coluna = tile_texture.subsurface(
+            Texture_Res * offset / Tile_size,
+            0,
+            1,
+            Texture_Res
+        )
+        coluna = pg.transform.scale(coluna, (SCALE, line_high))
+
+        screen.blit(coluna, (ray_id * SCALE, line_offset))
 
 
 @add_draw
@@ -125,20 +162,8 @@ def dialogue(item, screen, game):
     screen.blit(img, (x, y))
 
 
-@add_draw
-@njit()
+@add_draw_underwrite
 def floor(item, screen, game):
-    buffer = np.zeros((RES[0], RES[1], 4), dtype=np.uint8)
-
-    for id_x in range(RES[0] // SCALE):
-        ray_angle = np.deg2rad(id_x / (RES[0]/FOV) - FOV//2)
-        sin, cos = np.sin(ray_angle), np.cos(ray_angle)
-
-        for id_y in range((RES[1]/2) / SCALE):
-            n = (RES[1]/2) / SCALE - id_y
-
-            player_x = n * cos
-            player_y = n * sin
-
-
-
+    img = pg.surfarray.make_surface(item)
+    img = pg.transform.scale_by(img, SCALE)
+    screen.blit(img, (0, 0))

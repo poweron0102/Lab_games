@@ -3,9 +3,8 @@ import pygame as pg
 
 RUST = False
 
+RES = (1280, 720)  # 1280, 720   1366, 736   1260, 736  120, 100
 
-
-RES = (1280, 720)  # 1280, 720   1366, 736   1260, 736
 FPS = 60
 
 Player_speed = 200
@@ -27,3 +26,10 @@ Sprite_Ren_dist = 2048
 
 Mine_Map_zoom = 24
 Mini_Map_position = (2 * Mine_Map_zoom, RES[1] - 13 * Mine_Map_zoom)
+
+
+RenderWidth = RES[0] // SCALE
+HalfRenderWidth = RenderWidth // 2
+RenderHeight = RES[1] // SCALE
+HalfRenderHeight = RenderHeight // 2
+HalfFOV = FOV // 2
