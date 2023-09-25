@@ -62,12 +62,12 @@ def render_line(ray_dist, ray_id, ray_point, look, tile_texture, screen):
         else:  # Oeste
             offset = ray_point[1] % Tile_size
 
-        alt_pos = np.abs(line_offset) if line_offset < 0 else 0
+        #alt_pos = np.abs(line_offset) if line_offset < 0 else 0
         alt_size = line_high if line_high < RES[1] else RES[1]
-        for id_y in range(int(line_offset + alt_pos), int(alt_size)):
+        for id_y in range(int(alt_size)):
             for id_x in range(SCALE):
                 # print(f"x:{int(Texture_Res * offset / Tile_size)}   y:{int(id_y/line_high * Texture_Res)}")
-                screen[ray_id + id_x][id_y] = tile_texture[int(Texture_Res * offset / Tile_size)][int(id_y/line_high * Texture_Res)]
+                screen[ray_id * SCALE + id_x][id_y] = tile_texture[int(Texture_Res * offset / Tile_size)][int(id_y/line_high * Texture_Res)]
 
 
 
@@ -80,7 +80,6 @@ def ray_cast(item, screen, game):
         tile_texture = None
 
     render_line(ray_dist, ray_id, ray_point, look, tile_texture, pg.surfarray.pixels3d(screen))
-
 
     """
     ray_dist, ray_id, ray_point, look = item
