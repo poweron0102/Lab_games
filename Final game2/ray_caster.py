@@ -10,7 +10,7 @@ import fast_ray_cast
 # import math
 
 
-@njit()
+@njit(fastmath=FastMath)
 def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
     # (0, (tamanho * math.cos(player_ang - angle_ray), contador, ponto, look))
     # rays = np.empty(RES[0] // SCALE, dtype=np.dtype( [np.uint8, [float, np.uint16, [float, float], np.uint8]] ))

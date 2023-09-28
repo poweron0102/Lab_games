@@ -1,8 +1,8 @@
 import numpy as np
 import pygame as pg
-from numba import njit, jit
+from numba import njit, jit, prange
 from settings import *
-from map import Tiles
+from map import Tiles, Floor_texture
 
 Draw_functions = []
 Overwrites = []
@@ -47,8 +47,8 @@ class Drawer:
         self.to_draw.clear()
 
 
-@njit()
-def render_line(ray_dist, ray_id, ray_point, look, tile_texture, screen):
+@jit(fastmath=FastMath)
+def render_line(ray_dist, ray_id, ray_point, look, tile_texture, world_floor, scale, screen):
     line_high = Tile_size * RES[0] / ray_dist
     line_offset = (RES[1] - line_high) / 2
 
@@ -64,12 +64,17 @@ def render_line(ray_dist, ray_id, ray_point, look, tile_texture, screen):
 
         if line_high <= RES[1]:
             for id_y in range(int(line_high)):
-                for id_x in range(SCALE):
-                    screen[ray_id * SCALE + id_x][int(line_offset + id_y)] = tile_texture[offset][int(id_y / line_high * Texture_Res)]
+                for id_x in range(scale):
+                    screen[ray_id * SCALE + id_x][int(line_offset + id_y)] =\
+                        tile_texture[offset][int(id_y / line_high * Texture_Res)]
+            # draw floor
+            for id_y in range(int(line_offset + line_high), RES[1]): pass
+
         else:
             for id_y in range(RES[1]):
-                for id_x in range(SCALE):
-                    screen[ray_id * SCALE + id_x][id_y] = tile_texture[offset][int((id_y - line_offset) / line_high * Texture_Res)]
+                for id_x in range(scale):
+                    screen[ray_id * SCALE + id_x][id_y] =\
+                        tile_texture[offset][int((id_y - line_offset) / line_high * Texture_Res)]
 
 
 @add_draw
@@ -80,45 +85,17 @@ def ray_cast(item, screen, game):
     else:
         tile_texture = None
 
-    render_line(ray_dist, ray_id, ray_point, look, tile_texture, pg.surfarray.pixels3d(screen))
+    render_line(
+        ray_dist,
+        ray_id,
+        ray_point,
+        look,
+        tile_texture,
+        game.map.world_floor,
+        SCALE if not game.player.xray else SCALE//2,
+        pg.surfarray.pixels3d(screen)
+    )
 
-    """
-    ray_dist, ray_id, ray_point, look = item
-    line_high = Tile_size * RES[0] / ray_dist
-    if line_high > 4000: line_high = 4000  # <-- A gambiarra
-    line_offset = (RES[1] - line_high) / 2
-
-    if game.map.tile_texture(ray_point[0], ray_point[1]):
-        if look == 0:  # Norte
-            offset = Tile_size - (ray_point[0] % Tile_size)
-        elif look == 1:  # Sul
-            offset = ray_point[0] % Tile_size
-        elif look == 2:  # Lest
-            offset = Tile_size - (ray_point[1] % Tile_size)
-        else:  # Oeste
-            offset = ray_point[1] % Tile_size
-
-        coluna = game.map.tile_texture(ray_point[0], ray_point[1])[look].subsurface(
-            Texture_Res * offset / Tile_size,
-            0,
-            1,
-            Texture_Res
-        )
-        coluna = pg.transform.scale(coluna, (SCALE, line_high))
-
-        screen.blit(coluna, (ray_id * SCALE, line_offset))
-        return
-
-    pg.draw.rect(screen,  # Tela
-                 game.map.tile_color(ray_point[0], ray_point[1]),  # color
-                 (
-                     ray_id * SCALE,
-                     line_offset,
-                     SCALE,
-                     line_high
-                 )
-                 )
-    """
 
 
 @add_draw_overwrite

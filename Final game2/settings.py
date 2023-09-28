@@ -1,7 +1,9 @@
 import math
 import pygame as pg
 
-RUST = False
+RUST = True
+FastMath = True  # Gambiarra para ganhar speed
+
 
 RES = (1280, 720)  # 1280, 720   1366, 736   1260, 736  120, 100
 

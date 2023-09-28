@@ -12,10 +12,13 @@ class Player:
 
         self.speed = Player_speed
 
+        self.xray = False
         self.open_map = False
         self.interact = False
 
         self.ang = math.radians(Default_angulo)
+
+        self.keys = pg.key.get_pressed()
 
         self.game = game
 
@@ -44,17 +47,19 @@ class Player:
         if keys[pg.K_l]:
             self.game.action.Lose()
 
-        if keys[pg.K_e]:
+        if keys[pg.K_e] and not self.keys[pg.K_e]:
             self.interact = True
         else:
             self.interact = False
 
-        if keys[pg.K_m]:
-            if self.open_map:
-                self.open_map = False
-            else:
-                self.open_map = True
+        if keys[pg.K_m] and not self.keys[pg.K_m]:
+            self.open_map = not self.open_map
+
+        if keys[pg.K_x] and not self.keys[pg.K_x]:
+            self.xray = not self.xray
         # Outros -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        self.keys = keys
 
         # Movimento Mouse -=-=-=-=-=-=-=-=-=-=-=-=-=-=
         mouse_pos = pg.mouse.get_pos()

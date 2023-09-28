@@ -2,19 +2,20 @@ import pygame as pg
 import numpy as np
 from pygame import Surface
 from settings import *
+from numba.experimental.jitclass import jitclass
 
 Tiles = [
     # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_high': 1, 'render': False}
     ['', False, [255, 255, 255], None, 1, False, None],
     ['', True, 'darkgray', None, 1, True, 'quartz_bricks'],
-    ['', True, 'red', None, 1, True, None],
+    ['', True, 'red', None, 1, True, 'furnace_side none furnace_front_on none'],
     ['', True, 'Purple', None, 1, True, 'n s l w'],
     ['', False, 'green', 'Next_map', 1, False, None],
     ['', False, '#c92a2a', 'Lose', 1, False, None],
 ]
 
 
-def update_tiles():
+def update_texture():
     for tile in Tiles:
         if type(tile[6]) == str:
             to_load = tile[6].split()
@@ -22,6 +23,9 @@ def update_tiles():
             for id, texture_name in enumerate(to_load[1:]):
                 if texture_name == 'none': continue
                 tile[6][id + 1] = pg.image.load(f'assets/walls/{texture_name}.png').convert()
+
+    for id, floor in enumerate(Floor_texture):
+        Floor_texture[id] = pg.image.load(f'assets/floor/{floor}.png').convert_alpha()
 
 
 world_map = np.array([
@@ -66,6 +70,8 @@ world_map = np.array([
         [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
     ]
 ])
+
+Floor_texture = []
 
 world_floor = np.array([
     [  # Mapa 0
@@ -119,7 +125,7 @@ class Map:
         self.world_map = world_map[mapa]
         self.world_floor = world_floor[mapa]
 
-        update_tiles()
+        update_texture()
 
     def get_tile(self, x, y):
         x = int(x // Tile_size)
