@@ -109,7 +109,6 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
     return rays
 
 
-"""
 @njit()
 def cast_floor(player_x, player_y, player_ang, world_floor):
     buffer = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
@@ -120,10 +119,10 @@ def cast_floor(player_x, player_y, player_ang, world_floor):
         fish = np.cos(np.deg2rad(id_x / (RenderWidth / FOV) - HalfFOV))
 
         for id_y in range(HalfRenderHeight):
-            n = Tile_size * (HalfRenderHeight / (HalfRenderHeight - id_y+1)) / fish
+            n = Tile_size * (HalfRenderHeight / (HalfRenderHeight - id_y + 1)) / fish
 
-            ray_x = player_x + (n * cos)
-            ray_y = player_y + (n * sin)
+            ray_x = (player_x + (n * cos))
+            ray_y = (player_y + (n * sin))
 
             y = int(ray_y // Tile_size)
             if 0 <= y < len(world_floor):
@@ -135,7 +134,6 @@ def cast_floor(player_x, player_y, player_ang, world_floor):
                         buffer[id_x][RenderHeight - id_y - 1] = [0, 0, 0]
 
     return buffer
-"""
 
 
 class RayCaster:
@@ -159,7 +157,6 @@ class RayCaster:
         # print(self.rays)
 
     def ray_size_python(self):
-
         self.game.drawer.to_draw.extend(cast_walls(
             self.game.player.x,
             self.game.player.y,
@@ -179,6 +176,7 @@ class RayCaster:
              )
         )
         """
+
 
     def update(self):
         if RUST:

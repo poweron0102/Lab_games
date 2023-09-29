@@ -1,7 +1,7 @@
 import math
 import pygame as pg
 
-RUST = True
+RUST = False
 FastMath = True  # Gambiarra para ganhar speed
 
 
