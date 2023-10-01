@@ -52,3 +52,16 @@ class Sprite:
 
         if self.action:
             self.game.action.do_action(self.action, self)
+
+
+class SpriteHandler:
+    def __init__(self, game):
+        self.game: InGame = game
+        self.sprites: list[Sprite] = []
+
+    def update(self):
+        for sprite in self.sprites:
+            sprite.update()
+
+    def add(self, sprite: Sprite):
+        self.sprites.append(sprite)

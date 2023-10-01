@@ -1,5 +1,6 @@
-# from __future__ import annotations
 import sys
+from types import ModuleType
+
 from player import *
 from ray_caster import *
 from actions import *
@@ -17,11 +18,13 @@ def check_events():
 
 class InGame:
     dialogue_handler: DialogueHandler
+    sprite_handler: SpriteHandler
     drawer: Drawer
     action: Actions
     ray_caster: RayCaster
     player: Player
     map: Map
+    level: ModuleType
 
     def __init__(self):
         pg.init()
@@ -31,20 +34,12 @@ class InGame:
         self.time = pg.time.get_ticks()
         self.leas_time = pg.time.get_ticks()
         self.delta_time = 0
-        self.new_game()
-        self.font_Blackout = pg.font.Font('fonts/Blackout.otf', 250)
+        self.new_game("base")
         # pg.mouse.set_visible
 
-    def new_game(self):
-        self.map = Map(self)
-        self.player = Player(self)
-        self.ray_caster = RayCaster(self)
-        self.action = Actions(self)
-        self.drawer = Drawer(self)
-
-        self.plaqueta = Sprite(self, 'platelet', 545, 610, action='construction')
-        self.dialogue_handler = DialogueHandler(self)
-        # self.dig = Dialogue(5, "Com licença, me desculpe, mas nos estamos fazendo uma construção.", "platelet")
+    def new_game(self, level: str):
+        self.level = __import__(level)
+        self.level.init(self)
 
     def update(self):
         pg.display.flip()
@@ -58,14 +53,7 @@ class InGame:
         while True:
             check_events()
             self.update()
-            self.player.update()
-            self.action.update()
-            self.ray_caster.update()
-
-            self.plaqueta.update()
-            self.dialogue_handler.update()
-
-            self.drawer.update()
+            self.level.loop(self)
 
 
 if __name__ == '__main__':
