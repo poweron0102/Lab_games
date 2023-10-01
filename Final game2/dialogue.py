@@ -3,6 +3,9 @@ from pygame import SurfaceType
 
 from settings import *
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from main import InGame
 
 class Dialogue:
     def __init__(self, time, dialogue: str, speaker: str, audio=None, font='fonts/Roboto-Thin.ttf', size=25,
@@ -74,7 +77,7 @@ class Dialogue:
 
 class DialogueHandler:
     def __init__(self, game):
-        self.game = game
+        self.game: InGame = game
         self.queue: list[Dialogue | None] = []
 
     def update(self):

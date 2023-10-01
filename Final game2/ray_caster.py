@@ -3,11 +3,7 @@ from numba import njit, typeof
 from map import *
 from functions import *
 import numpy as np
-# from numba import njit
 import fast_ray_cast
-
-
-# import math
 
 
 @njit(fastmath=FastMath)
@@ -146,13 +142,12 @@ def cast_floor(player_x, player_y, player_ang, world_floor, floor_textures):
                             ][
                                 int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
                             ]
-
     return buffer
 
 
 class RayCaster:
     def __init__(self, game):
-        self.game = game
+        self.game: InGame = game
 
     def ray_size_rust(self):
         self.game.drawer.to_draw.extend(fast_ray_cast.cast(

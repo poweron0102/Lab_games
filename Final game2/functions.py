@@ -1,6 +1,7 @@
 import math
 from numba import njit
 
+
 @njit()
 def angle_to_fist(angle: float) -> float:
     if angle > 2 * math.pi:
@@ -21,5 +22,3 @@ def sig(numero):
         return -1
     else:
         return 1
-
-

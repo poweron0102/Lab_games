@@ -4,9 +4,15 @@ from map import *
 import math
 from functions import sig
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from main import InGame
+
 
 class Player:
     def __init__(self, game):
+        self.game: InGame = game
+
         self.x = Posicao_inicial[0]
         self.y = Posicao_inicial[1]
 
@@ -19,8 +25,6 @@ class Player:
         self.ang = math.radians(Default_angulo)
 
         self.keys = pg.key.get_pressed()
-
-        self.game = game
 
     def update(self):
         # Movimento WASD  -=-=-=-=-=-=-=-=-=-=-=-=-=-=

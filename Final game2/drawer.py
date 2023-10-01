@@ -5,6 +5,10 @@ from settings import *
 from functions import *
 from map import Tiles, Floor_texture
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from main import InGame
+
 Draw_functions = []
 Overwrites = []
 Underwrites = []
@@ -35,7 +39,7 @@ def draw_order(to_draw):
 
 class Drawer:
     def __init__(self, game):
-        self.game = game
+        self.game: InGame = game
         self.screen = game.screen
         self.to_draw = []
 

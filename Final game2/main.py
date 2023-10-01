@@ -1,3 +1,4 @@
+# from __future__ import annotations
 import sys
 from player import *
 from ray_caster import *
@@ -15,6 +16,13 @@ def check_events():
 
 
 class InGame:
+    dialogue_handler: DialogueHandler
+    drawer: Drawer
+    action: Actions
+    ray_caster: RayCaster
+    player: Player
+    map: Map
+
     def __init__(self):
         pg.init()
         pg.font.init()
@@ -25,7 +33,7 @@ class InGame:
         self.delta_time = 0
         self.new_game()
         self.font_Blackout = pg.font.Font('fonts/Blackout.otf', 250)
-        # pg.mouse.set_visible(False)
+        # pg.mouse.set_visible
 
     def new_game(self):
         self.map = Map(self)
@@ -36,7 +44,7 @@ class InGame:
 
         self.plaqueta = Sprite(self, 'platelet', 545, 610, action='construction')
         self.dialogue_handler = DialogueHandler(self)
-        #self.dig = Dialogue(5, "Com licença, me desculpe, mas nos estamos fazendo uma construção.", "platelet")
+        # self.dig = Dialogue(5, "Com licença, me desculpe, mas nos estamos fazendo uma construção.", "platelet")
 
     def update(self):
         pg.display.flip()

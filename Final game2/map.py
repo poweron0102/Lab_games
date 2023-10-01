@@ -4,6 +4,10 @@ from pygame import Surface
 from settings import *
 from numba.experimental.jitclass import jitclass
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from main import InGame
+
 Tiles = [
     # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_high': 1, 'render': False}
     ['', False, [255, 255, 255], None, 1, False, None],
@@ -122,7 +126,7 @@ world_floor = np.array([
 
 class Map:
     def __init__(self, game, mapa=0):
-        self.game = game
+        self.game: InGame = game
         self.mapa_atual = mapa
 
         update_texture()
