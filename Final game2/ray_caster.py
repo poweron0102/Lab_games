@@ -1,4 +1,4 @@
-from numba import njit
+from numba import njit, typeof
 
 from map import *
 from functions import *
@@ -101,7 +101,7 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
             look = look_ew
 
         # rays[contador] = (0, (tamanho * math.cos(player_ang - angle_ray), contador, ponto, look))
-        rays.append((0, (tamanho * math.cos(player_ang - angle_ray), contador, ponto, look)))
+        rays.append((0, (tamanho * math.cos(player_ang - angle_ray), contador, ponto, angle_ray, look)))
 
         angle_ray += math.radians(FOV) / (RES[0] // SCALE)
         angle_ray = angle_to_fist(angle_ray)
@@ -109,8 +109,8 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
     return rays
 
 
-@njit()
-def cast_floor(player_x, player_y, player_ang, world_floor):
+@njit(fastmath=FastMath)
+def cast_floor(player_x, player_y, player_ang, world_floor, floor_textures):
     buffer = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
 
     for id_x in range(RenderWidth):
@@ -119,7 +119,7 @@ def cast_floor(player_x, player_y, player_ang, world_floor):
         fish = np.cos(np.deg2rad(id_x / (RenderWidth / FOV) - HalfFOV))
 
         for id_y in range(HalfRenderHeight):
-            n = Tile_size * (HalfRenderHeight / (HalfRenderHeight - id_y + 1)) / fish
+            n = Tile_size * (HalfRenderWidth / (HalfRenderHeight - id_y)) / fish
 
             ray_x = (player_x + (n * cos))
             ray_y = (player_y + (n * sin))
@@ -128,10 +128,24 @@ def cast_floor(player_x, player_y, player_ang, world_floor):
             if 0 <= y < len(world_floor):
                 x = int(ray_x // Tile_size)
                 if 0 <= x < len(world_floor[y]):
-                    if world_floor[y][x] == 1:
-                        buffer[id_x][RenderHeight - id_y - 1] = [0, 255, 0]
-                    else:
-                        buffer[id_x][RenderHeight - id_y - 1] = [0, 0, 0]
+                    floor_id = world_floor[y][x]
+                    if floor_id != 0:
+                        floor_id -= 1
+                        buffer[id_x][RenderHeight - id_y - 1] = \
+                            floor_textures[floor_id][
+                                int(((ray_x % Tile_size) / Tile_size) * Texture_Res)
+                            ][
+                                int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
+                            ]
+                    floor_id = world_floor[y][x]
+                    if floor_id != 0:
+                        floor_id -= 1
+                        buffer[id_x][id_y] = \
+                            floor_textures[floor_id][
+                                int(((ray_x % Tile_size) / Tile_size) * Texture_Res)
+                            ][
+                                int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
+                            ]
 
     return buffer
 
@@ -165,31 +179,19 @@ class RayCaster:
         )
         )
 
-        """
         self.game.drawer.to_draw.append(
             (5, cast_floor(
                 self.game.player.x,
                 self.game.player.y,
                 self.game.player.ang,
                 self.game.map.world_floor,
+                self.game.map.floor_textures,
             )
              )
         )
-        """
-
 
     def update(self):
         if RUST:
             self.ray_size_rust()
         else:
             self.ray_size_python()
-
-    # def draw_rays(self, screen):
-    #    self.ray_size()
-    #    # self.ray_size_fast()
-    #
-    #    # print(self.rays)
-    #    for ray in self.rays:
-    #        pg.draw.line(screen, 'blue', (self.game.player.x, self.game.player.y), ray[1])
-    #        # print(ray)
-    #    self.rays.clear()

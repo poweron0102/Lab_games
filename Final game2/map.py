@@ -25,7 +25,8 @@ def update_texture():
                 tile[6][id + 1] = pg.image.load(f'assets/walls/{texture_name}.png').convert()
 
     for id, floor in enumerate(Floor_texture):
-        Floor_texture[id] = pg.image.load(f'assets/floor/{floor}.png').convert_alpha()
+        img = pg.image.load(f'assets/floor/{floor}.png').convert_alpha()
+        Floor_texture[id] = pg.surfarray.pixels3d(img)
 
 
 world_map = np.array([
@@ -71,7 +72,9 @@ world_map = np.array([
     ]
 ])
 
-Floor_texture = []
+Floor_texture = [
+    'birch_planks',
+]
 
 world_floor = np.array([
     [  # Mapa 0
@@ -122,10 +125,11 @@ class Map:
         self.game = game
         self.mapa_atual = mapa
 
+        update_texture()
+
         self.world_map = world_map[mapa]
         self.world_floor = world_floor[mapa]
-
-        update_texture()
+        self.floor_textures = np.array(Floor_texture)
 
     def get_tile(self, x, y):
         x = int(x // Tile_size)

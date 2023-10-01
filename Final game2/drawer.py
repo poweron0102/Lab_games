@@ -2,6 +2,7 @@ import numpy as np
 import pygame as pg
 from numba import njit, jit, prange
 from settings import *
+from functions import *
 from map import Tiles, Floor_texture
 
 Draw_functions = []
@@ -47,8 +48,11 @@ class Drawer:
         self.to_draw.clear()
 
 
-@jit(fastmath=FastMath)
-def render_line(ray_dist, ray_id, ray_point, look, tile_texture, world_floor, scale, screen):
+@njit(fastmath=FastMath)
+def render_line(
+        ray_dist, ray_id, ray_point, look,
+        tile_texture, scale, screen
+):
     line_high = Tile_size * RES[0] / ray_dist
     line_offset = (RES[1] - line_high) / 2
 
@@ -65,21 +69,19 @@ def render_line(ray_dist, ray_id, ray_point, look, tile_texture, world_floor, sc
         if line_high <= RES[1]:
             for id_y in range(int(line_high)):
                 for id_x in range(scale):
-                    screen[ray_id * SCALE + id_x][int(line_offset + id_y)] =\
+                    screen[ray_id * SCALE + id_x][int(line_offset + id_y)] = \
                         tile_texture[offset][int(id_y / line_high * Texture_Res)]
-            # draw floor
-            for id_y in range(int(line_offset + line_high), RES[1]): pass
 
         else:
             for id_y in range(RES[1]):
                 for id_x in range(scale):
-                    screen[ray_id * SCALE + id_x][id_y] =\
+                    screen[ray_id * SCALE + id_x][id_y] = \
                         tile_texture[offset][int((id_y - line_offset) / line_high * Texture_Res)]
 
 
 @add_draw
 def ray_cast(item, screen, game):
-    ray_dist, ray_id, ray_point, look = item
+    ray_dist, ray_id, ray_point, angle_ray, look = item
     if game.map.tile_texture(ray_point[0], ray_point[1]):
         tile_texture = pg.surfarray.pixels3d(game.map.tile_texture(ray_point[0], ray_point[1])[look])
     else:
@@ -91,11 +93,9 @@ def ray_cast(item, screen, game):
         ray_point,
         look,
         tile_texture,
-        game.map.world_floor,
-        SCALE if not game.player.xray else SCALE//2,
+        SCALE if not game.player.xray else SCALE // 2,
         pg.surfarray.pixels3d(screen)
     )
-
 
 
 @add_draw_overwrite
