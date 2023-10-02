@@ -1,6 +1,7 @@
 # from settings import *
 # import pygame as pg
-from map import *
+# from map import *
+from settings import *
 import math
 from functions import sig
 

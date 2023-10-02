@@ -2,164 +2,62 @@ import pygame as pg
 import numpy as np
 from pygame import Surface
 from settings import *
+from textures import *
 from numba.experimental.jitclass import jitclass
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from main import InGame
 
-Tiles = [
-    # T0 = {'Nome': '', 'Is_wall': False, 'Color': [0, 0, 0, 0], 'action': False, 'Wall_high': 1, 'render': False}
-    ['', False, [255, 255, 255], None, 1, False, None],
-    ['', True, 'darkgray', None, 1, True, 'quartz_bricks'],
-    ['', True, 'red', None, 1, True, 'furnace_side none furnace_front_on none'],
-    ['', True, 'Purple', None, 1, True, 'n s l w'],
-    ['', False, 'green', 'Next_map', 1, False, None],
-    ['', False, '#c92a2a', 'Lose', 1, False, None],
-]
 
-
-def update_texture():
-    for tile in Tiles:
-        if type(tile[6]) == str:
-            to_load = tile[6].split()
-            tile[6] = [pg.image.load(f'assets/walls/{to_load[0]}.png').convert()] * 4
-            for id, texture_name in enumerate(to_load[1:]):
-                if texture_name == 'none': continue
-                tile[6][id + 1] = pg.image.load(f'assets/walls/{texture_name}.png').convert()
-
-    for id, floor in enumerate(Floor_texture):
-        img = pg.image.load(f'assets/floor/{floor}.png').convert_alpha()
-        Floor_texture[id] = pg.surfarray.pixels3d(img)
-
-
-world_map = np.array([
-    [  # Mapa 0
-        [0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 2, 3, 3, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 2, 0, 0, 0, 2, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 4, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-
-    ],
-    [  # Mapa 1
-        [0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4],
-        [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    ],
-    [  # Mapa 2
-        [0, 0, 1, 0, 0, 0, 0, 2, 0, 3, 3, 3, 1, 2, 1, 0, 0, 0, 1, 1],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 3, 3, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 3, 0, 0, 0, 2, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4],
-        [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    ]
-])
-
-Floor_texture = [
-    'birch_planks',
-]
-
-world_floor = np.array([
-    [  # Mapa 0
-        [1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-
-    ],
-    [  # Mapa 1
-        [0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4],
-        [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    ],
-    [  # Mapa 2
-        [0, 0, 1, 0, 0, 0, 0, 2, 0, 3, 3, 3, 1, 2, 1, 0, 0, 0, 1, 1],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 3, 3, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 3, 0, 0, 0, 2, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4],
-        [0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    ]
-])
+class Tile:
+    def __init__(self, is_wall, render, color, action, texture: int | None):
+        self.is_wall = is_wall
+        self.render = render
+        self.color = color
+        self.action = action
+        self.texture = texture
 
 
 class Map:
-    def __init__(self, game, mapa=0):
+    def __init__(self, game, world_map, tile_set, texture_set, texture_floor):
         self.game: InGame = game
-        self.mapa_atual = mapa
 
-        update_texture()
+        self.tile_set: list[Tile] = tile_set
+        self.texture_set: list[Texture] = texture_set
 
-        self.world_map = world_map[mapa]
-        self.world_floor = world_floor[mapa]
-        self.floor_textures = np.array(Floor_texture)
+        self.world_wall: list[list[int]] = world_map[0]
+        self.world_floor: list[list[int]] = world_map[1]
+        self.world_ceiling: list[list[int]] = world_map[2]
+
+        self.texture_floor = np.empty([len(texture_floor), Texture_Res, Texture_Res, 3], dtype=np.int8)
+        for tex_id, tex_name in enumerate(texture_floor):
+            self.texture_floor[tex_id] = pg.surfarray.array3d(pg.image.load(f"assets/floor/{tex_name}.png"))
 
     def get_tile(self, x, y):
         x = int(x // Tile_size)
         y = int(y // Tile_size)
-        if 0 <= y <= len(self.world_map) - 1 and 0 <= x <= len(self.world_map[y]) - 1:
-            return self.world_map[y][x]
+        if 0 <= y <= len(self.world_wall) - 1 and 0 <= x <= len(self.world_wall[y]) - 1:
+            return self.world_wall[y][x]
         else:
             return 0
 
     def is_wall(self, x, y) -> bool:
-        return Tiles[self.get_tile(x, y)][1]
+        return self.tile_set[self.get_tile(x, y)].is_wall
 
     def tile_color(self, x, y):
         id = self.get_tile(x, y)
         if id:
-            return Tiles[self.get_tile(x, y)][2]
+            return self.tile_set[self.get_tile(x, y)].color
         return [0, 0, 0]
 
     def tile_action(self, x, y):
-        return Tiles[self.get_tile(x, y)][3]
-
-    def wall_high(self, x, y):
-        return Tiles[self.get_tile(x, y)][4]
+        return self.tile_set[self.get_tile(x, y)].action
 
     def is_render(self, x, y) -> bool:
-        return Tiles[self.get_tile(x, y)][5]
+        return self.tile_set[self.get_tile(x, y)].render
 
-    def tile_texture(self, x, y) -> Surface | None:
-        return Tiles[self.get_tile(x, y)][6]
+    def tile_texture(self, x, y) -> Texture | None:
+        if self.tile_set[self.get_tile(x, y)].texture:
+            return self.texture_set[self.tile_set[self.get_tile(x, y)].texture]

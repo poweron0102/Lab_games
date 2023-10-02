@@ -3,7 +3,6 @@ import pygame as pg
 from numba import njit, jit, prange
 from settings import *
 from functions import *
-from map import Tiles, Floor_texture
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -87,7 +86,7 @@ def render_line(
 def ray_cast(item, screen, game):
     ray_dist, ray_id, ray_point, angle_ray, look = item
     if game.map.tile_texture(ray_point[0], ray_point[1]):
-        tile_texture = pg.surfarray.pixels3d(game.map.tile_texture(ray_point[0], ray_point[1])[look])
+        tile_texture = pg.surfarray.pixels3d(game.map.tile_texture(ray_point[0], ray_point[1]).texture(look))
     else:
         tile_texture = None
 
@@ -112,14 +111,14 @@ def player(self, screen, game):
 
 @add_draw_overwrite
 def mine_map(self, screen, game):
-    tamanho = (Mine_Map_zoom * len(self.world_map[0]), Mine_Map_zoom * len(self.world_map))
+    tamanho = (Mine_Map_zoom * len(self.world_wall[0]), Mine_Map_zoom * len(self.world_wall))
     pg.draw.rect(self.game.screen, [220, 220, 220], (Mini_Map_position, tamanho))
-    for y, linha in enumerate(self.world_map):
+    for y, linha in enumerate(self.world_wall):
         yr = int((y * Mine_Map_zoom) + Mini_Map_position[1])
         for x, tile in enumerate(linha):
             xr = int((x * Mine_Map_zoom) + Mini_Map_position[0])
 
-            pg.draw.rect(screen, Tiles[self.world_map[y][x]][2], (xr, yr, Mine_Map_zoom, Mine_Map_zoom), 20)
+            pg.draw.rect(screen, self.tile_set[self.world_wall[y][x]].color, (xr, yr, Mine_Map_zoom, Mine_Map_zoom), 20)
 
 
 @add_draw

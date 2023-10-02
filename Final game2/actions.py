@@ -1,5 +1,6 @@
-from map import *
+from map import Map
 from dialogue import Dialogue
+
 from time import sleep
 from sys import exit
 

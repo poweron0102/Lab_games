@@ -1,9 +1,14 @@
-from numba import njit, typeof
+from numba import njit, typeof, jit
 
-from map import *
+#from map import *
+from settings import *
 from functions import *
 import numpy as np
 import fast_ray_cast
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from main import InGame
 
 
 @njit(fastmath=FastMath)
@@ -106,7 +111,7 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
 
 
 @njit(fastmath=FastMath)
-def cast_floor(player_x, player_y, player_ang, world_floor, floor_textures):
+def cast_floor(player_x, player_y, player_ang, world_floor, world_ceiling, floor_textures):
     buffer = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
 
     for id_x in range(RenderWidth):
@@ -133,7 +138,7 @@ def cast_floor(player_x, player_y, player_ang, world_floor, floor_textures):
                             ][
                                 int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
                             ]
-                    floor_id = world_floor[y][x]
+                    floor_id = world_ceiling[y][x]
                     if floor_id != 0:
                         floor_id -= 1
                         buffer[id_x][id_y] = \
@@ -161,7 +166,7 @@ class RayCaster:
             SCALE,
             Render_dist,
             [1, 2, 3],
-            self.game.map.world_map
+            self.game.map.world_wall
         ))
         # print(self.rays)
 
@@ -170,17 +175,17 @@ class RayCaster:
             self.game.player.x,
             self.game.player.y,
             self.game.player.ang,
-            self.game.map.world_map,
+            self.game.map.world_wall,
         )
         )
-
         self.game.drawer.to_draw.append(
             (5, cast_floor(
                 self.game.player.x,
                 self.game.player.y,
                 self.game.player.ang,
                 self.game.map.world_floor,
-                self.game.map.floor_textures,
+                self.game.map.world_ceiling,
+                self.game.map.texture_floor,
             )
              )
         )
