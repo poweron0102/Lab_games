@@ -18,15 +18,16 @@ class Menu:
 
 def init(game: 'Game | Menu'):
     game.background = pg.image.load("assets/background.png").convert()
+
     game.button_play = Button(
         (Width // 2) - 100, 100,
         "Play",
-        function=lambda: print("foi")
+        function=lambda g: g.new_level("place_holder"), arg=game
     )
     game.button_difficulty = Button(
         (Width // 2) - 100, 250,
         "Difficulty",
-        function=lambda: print("foi2")
+        function=lambda g: g.new_level("difficulty"), arg=game
     )
     game.button_exit = Button(
         (Width // 2) - 100, 400,

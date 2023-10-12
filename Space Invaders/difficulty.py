@@ -8,36 +8,42 @@ if TYPE_CHECKING:
     from main import Game
 
 
-class Menu:
+class Difficulty:
     background: pg.Surface
 
-    button_play: Button
-    button_difficulty: Button
-    button_exit: Button
+    button_easy: Button
+    button_normal: Button
+    button_hard: Button
 
 
-def init(game: 'Game | Menu'):
+def init(game: 'Game | Difficulty'):
     game.background = pg.image.load("assets/background.png").convert()
-    game.button_play = Button(
+
+    def set_difficulty(item):
+        g, difficulty = item
+        g.Difficulty = difficulty
+        print("Dificuldade setada para", g.Difficulty)
+
+    game.button_easy = Button(
         (Width // 2) - 100, 100,
-        "Play",
-        function=lambda: print("foi")
+        "Easy",
+        function=set_difficulty, arg=(game, 1)
     )
-    game.button_difficulty = Button(
+    game.button_normal = Button(
         (Width // 2) - 100, 250,
-        "Difficulty",
-        function=lambda: print("foi2")
+        "Normal",
+        function=set_difficulty, arg=(game, 2)
     )
-    game.button_exit = Button(
+    game.button_hard = Button(
         (Width // 2) - 100, 400,
-        "Exit",
-        function=exit
+        "Hard",
+        function=set_difficulty, arg=(game, 3)
     )
 
 
-def loop(game: 'Game | Menu'):
+def loop(game: 'Game | Difficulty'):
     game.screen.blit(game.background, (0, 0))
 
-    game.button_play.update()
-    game.button_difficulty.update()
-    game.button_exit.update()
+    game.button_easy.update()
+    game.button_normal.update()
+    game.button_hard.update()
