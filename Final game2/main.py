@@ -7,6 +7,7 @@ from actions import *
 from sprites import *
 from drawer import *
 from dialogue import *
+from parallax import *
 
 
 def check_events():
@@ -17,6 +18,7 @@ def check_events():
 
 
 class InGame:
+    parallax: Parallax
     dialogue_handler: DialogueHandler
     sprite_handler: SpriteHandler
     drawer: Drawer
@@ -34,7 +36,7 @@ class InGame:
         self.time = pg.time.get_ticks()
         self.leas_time = pg.time.get_ticks()
         self.delta_time = 0
-        self.new_game("base")
+        self.new_game("alpha")
         # pg.mouse.set_visible
 
     def new_game(self, level: str):
@@ -43,6 +45,7 @@ class InGame:
 
     def update(self):
         pg.display.flip()
+        self.screen.fill([0, 0, 0])  # preto
         self.clock.tick(FPS)
         self.leas_time = self.time
         self.time = pg.time.get_ticks()

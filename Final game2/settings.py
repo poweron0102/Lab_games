@@ -30,8 +30,16 @@ Mine_Map_zoom = 24
 Mini_Map_position = (2 * Mine_Map_zoom, RES[1] - 13 * Mine_Map_zoom)
 
 
+RenderWidth = RES[0]
+HalfRenderWidth = RenderWidth // 2
+RenderHeight = RES[1]
+HalfRenderHeight = RenderHeight // 2
+HalfFOV = FOV // 2
+
+"""
 RenderWidth = RES[0] // SCALE
 HalfRenderWidth = RenderWidth // 2
 RenderHeight = RES[1] // SCALE
 HalfRenderHeight = RenderHeight // 2
 HalfFOV = FOV // 2
+"""

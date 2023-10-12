@@ -111,8 +111,14 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
 
 
 @njit(fastmath=FastMath)
-def cast_floor(player_x, player_y, player_ang, world_floor, world_ceiling, floor_textures):
-    buffer = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
+def cast_floor(
+        player_x, player_y, player_ang,
+        world_floor, world_ceiling,
+        floor_textures,
+        buffer_img
+):
+    # buffer_img = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
+    # buffer_aph = np.zeros((RenderWidth, RenderHeight), dtype=np.uint8)
 
     for id_x in range(RenderWidth):
         ray_angle = player_ang + np.deg2rad(id_x / (RenderWidth / FOV) - HalfFOV)
@@ -132,22 +138,26 @@ def cast_floor(player_x, player_y, player_ang, world_floor, world_ceiling, floor
                     floor_id = world_floor[y][x]
                     if floor_id != 0:
                         floor_id -= 1
-                        buffer[id_x][RenderHeight - id_y - 1] = \
+                        buffer_img[id_x][RenderHeight - id_y - 1] = \
                             floor_textures[floor_id][
                                 int(((ray_x % Tile_size) / Tile_size) * Texture_Res)
                             ][
                                 int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
                             ]
+
+                        #buffer_aph[id_x][RenderHeight - id_y - 1] = 255
                     floor_id = world_ceiling[y][x]
                     if floor_id != 0:
                         floor_id -= 1
-                        buffer[id_x][id_y] = \
+                        buffer_img[id_x][id_y] = \
                             floor_textures[floor_id][
                                 int(((ray_x % Tile_size) / Tile_size) * Texture_Res)
                             ][
                                 int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
                             ]
-    return buffer
+
+                        #buffer_img[id_x][id_y] = 255
+    #return buffer_img, buffer_aph
 
 
 class RayCaster:
@@ -178,17 +188,16 @@ class RayCaster:
             self.game.map.world_wall,
         )
         )
-        self.game.drawer.to_draw.append(
-            (5, cast_floor(
-                self.game.player.x,
-                self.game.player.y,
-                self.game.player.ang,
-                self.game.map.world_floor,
-                self.game.map.world_ceiling,
-                self.game.map.texture_floor,
-            )
-             )
+        cast_floor(
+            self.game.player.x,
+            self.game.player.y,
+            self.game.player.ang,
+            self.game.map.world_floor,
+            self.game.map.world_ceiling,
+            self.game.map.texture_floor,
+            pg.surfarray.pixels3d(self.game.screen)
         )
+
 
     def update(self):
         if RUST:

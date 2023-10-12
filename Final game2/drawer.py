@@ -1,6 +1,7 @@
 import numpy as np
 import pygame as pg
 from numba import njit, jit, prange
+from time import sleep
 from settings import *
 from functions import *
 
@@ -43,11 +44,18 @@ class Drawer:
         self.to_draw = []
 
     def update(self):
-        self.screen.fill([0, 0, 0])  # preto
+        # self.screen.fill([0, 0, 0])  # preto
         # print(self.to_draw[0])
         self.to_draw.sort(reverse=True, key=draw_order)
-        for func_id, item in self.to_draw:
-            Draw_functions[func_id](item, self.screen, self.game)
+        if self.game.player.debug:
+            for func_id, item in self.to_draw:
+                Draw_functions[func_id](item, self.screen, self.game)
+                pg.display.flip()
+                sleep(0.007)
+        else:
+            for func_id, item in self.to_draw:
+                Draw_functions[func_id](item, self.screen, self.game)
+
         self.to_draw.clear()
 
 
@@ -150,6 +158,7 @@ def dialogue(item, screen, game):
 
 @add_draw_underwrite
 def floor(item, screen, game):
-    img = pg.surfarray.make_surface(item)
+    buffer_img, buffer_aph = item
+    img = pg.surfarray.make_surface(buffer_img)
     img = pg.transform.scale_by(img, SCALE)
     screen.blit(img, (0, 0))

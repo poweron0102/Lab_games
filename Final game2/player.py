@@ -22,6 +22,7 @@ class Player:
         self.xray = False
         self.open_map = False
         self.interact = False
+        self.debug = False
 
         self.ang = math.radians(Default_angulo)
 
@@ -49,19 +50,22 @@ class Player:
         # Movimento WASD  -=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
         # Outros -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        if keys[pg.K_l]:
-            self.game.action.Lose()
-
         if keys[pg.K_e] and not self.keys[pg.K_e]:
             self.interact = True
         else:
             self.interact = False
+
+        if keys[pg.K_0] and not self.keys[pg.K_0]:
+            self.debug = True
+        else:
+            self.debug = False
 
         if keys[pg.K_m] and not self.keys[pg.K_m]:
             self.open_map = not self.open_map
 
         if keys[pg.K_x] and not self.keys[pg.K_x]:
             self.xray = not self.xray
+
         # Outros -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         self.keys = keys
