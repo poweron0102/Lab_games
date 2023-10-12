@@ -26,7 +26,7 @@ class Button:
     """
     def __init__(
             self,
-            x, y,
+            x: int, y: int,
             text: str,
             font_size=25,
             color=(216, 53, 64),
