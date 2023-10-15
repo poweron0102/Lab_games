@@ -9,8 +9,6 @@ if TYPE_CHECKING:
 
 
 class Difficulty:
-    background: pg.Surface
-
     button_easy: Button
     button_normal: Button
     button_hard: Button
@@ -42,8 +40,6 @@ def init(game: 'Game | Difficulty'):
 
 
 def loop(game: 'Game | Difficulty'):
-    game.screen.blit(game.background, (0, 0))
-
     game.button_easy.update()
     game.button_normal.update()
     game.button_hard.update()

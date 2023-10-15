@@ -22,6 +22,9 @@ class Game:
         pg.font.init()
         self.Difficulty = 1
         self.screen = pg.display.set_mode((Width, Height))
+        self.background: pg.Surface | None = None
+        self.clock = pg.time.Clock()
+        self.fps = 60
         self.level = __import__("menu")
 
         self.level.init(self)
@@ -33,6 +36,11 @@ class Game:
         Executa a função init definida no arquivo, uma única vez
         e passa o loop para a função loop definida no mesmo arquivo.
         """
+        if hasattr(self.level, "deconstruct"):
+            self.level.deconstruct(self)
+
+        self.background = None
+
         self.level = __import__(nome)
 
         self.level.init(self)
@@ -53,9 +61,16 @@ class Game:
 
     def run(self):
         while True:
-            self.screen.fill((0, 0, 0))
+            if self.background:
+                self.screen.blit(self.background, (0, 0))
+            else:
+                self.screen.fill((0, 0, 0))
+
+            self.clock.tick(self.fps)
+
             self.update()
             self.level.loop(self)
+
             pg.display.flip()
 
 
