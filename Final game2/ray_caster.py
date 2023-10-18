@@ -6,6 +6,7 @@ from functions import *
 import numpy as np
 import fast_ray_cast
 
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -116,7 +117,7 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
 def cast_floor(
         player_x, player_y, player_ang,
         world_floor, world_ceiling,
-        floor_textures, texture_floor_alpha,
+        floor_textures, floor_textures_alpha,
         buffer_img
 ):
     # buffer_img = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
@@ -137,29 +138,16 @@ def cast_floor(
             if 0 <= y < len(world_floor):
                 x = int(ray_x // Tile_size)
                 if 0 <= x < len(world_floor[y]):
+                    tex_x_rel = int(((ray_x % Tile_size) / Tile_size) * Texture_Res)
+                    tex_y_rel = int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
+
                     floor_id = world_floor[y][x]
-                    if floor_id != 0:
-                        floor_id -= 1
-                        buffer_img[id_x][RenderHeight - id_y - 1] = \
-                            floor_textures[floor_id][
-                                int(((ray_x % Tile_size) / Tile_size) * Texture_Res)
-                            ][
-                                int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
-                            ]
+                    if floor_id != 0 and floor_textures_alpha[floor_id - 1][tex_x_rel][tex_y_rel] == 255:
+                        buffer_img[id_x][RenderHeight - id_y - 1] = floor_textures[floor_id - 1][tex_x_rel][tex_y_rel]
 
-                        # buffer_aph[id_x][RenderHeight - id_y - 1] = 255
-                    floor_id = world_ceiling[y][x]
-                    if floor_id != 0:
-                        floor_id -= 1
-                        buffer_img[id_x][id_y] = \
-                            floor_textures[floor_id][
-                                int(((ray_x % Tile_size) / Tile_size) * Texture_Res)
-                            ][
-                                int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
-                            ]
-
-                        # buffer_img[id_x][id_y] = 255
-    # return buffer_img, buffer_aph
+                    ceiling_id = world_ceiling[y][x]
+                    if ceiling_id != 0 and floor_textures_alpha[ceiling_id - 1][tex_x_rel][tex_y_rel] == 255:
+                        buffer_img[id_x][id_y] = floor_textures[ceiling_id - 1][tex_x_rel][tex_y_rel]
 
 
 class RayCaster:
