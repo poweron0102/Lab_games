@@ -6,12 +6,12 @@ from settings import *
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from main import InGame
+    from main import Game
 
 
 class Sprite:
     def __init__(self, game, name, x, y, scale=0.5, shift=0.07, action=None):
-        self.game: InGame = game
+        self.game: Game = game
         self.player = game.player
 
         self.x = x
@@ -56,7 +56,7 @@ class Sprite:
 
 class SpriteHandler:
     def __init__(self, game):
-        self.game: InGame = game
+        self.game: Game = game
         self.sprites: list[Sprite] = []
 
     def update(self):

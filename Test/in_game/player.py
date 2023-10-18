@@ -1,7 +1,7 @@
 import math
 import pygame as pg
 
-#from Test.in_game.in_game import InGame
+#from Test.in_game.in_game import Game
 from Test.settings import *
 
 

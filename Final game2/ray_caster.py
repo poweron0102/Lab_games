@@ -1,14 +1,16 @@
 from numba import njit, typeof, jit
 
-#from map import *
+# from map import *
 from settings import *
 from functions import *
 import numpy as np
 import fast_ray_cast
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from main import InGame
+    from main import Game
+    from in_game import InGame
 
 
 @njit(fastmath=FastMath)
@@ -114,7 +116,7 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
 def cast_floor(
         player_x, player_y, player_ang,
         world_floor, world_ceiling,
-        floor_textures,
+        floor_textures, texture_floor_alpha,
         buffer_img
 ):
     # buffer_img = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
@@ -145,7 +147,7 @@ def cast_floor(
                                 int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
                             ]
 
-                        #buffer_aph[id_x][RenderHeight - id_y - 1] = 255
+                        # buffer_aph[id_x][RenderHeight - id_y - 1] = 255
                     floor_id = world_ceiling[y][x]
                     if floor_id != 0:
                         floor_id -= 1
@@ -156,13 +158,13 @@ def cast_floor(
                                 int(((ray_y % Tile_size) / Tile_size) * Texture_Res)
                             ]
 
-                        #buffer_img[id_x][id_y] = 255
-    #return buffer_img, buffer_aph
+                        # buffer_img[id_x][id_y] = 255
+    # return buffer_img, buffer_aph
 
 
 class RayCaster:
     def __init__(self, game):
-        self.game: InGame = game
+        self.game: 'Game | InGame' = game
 
     def ray_size_rust(self):
         self.game.drawer.to_draw.extend(fast_ray_cast.cast(
@@ -195,9 +197,9 @@ class RayCaster:
             self.game.map.world_floor,
             self.game.map.world_ceiling,
             self.game.map.texture_floor,
+            self.game.map.texture_floor_alpha,
             pg.surfarray.pixels3d(self.game.screen)
         )
-
 
     def update(self):
         if RUST:

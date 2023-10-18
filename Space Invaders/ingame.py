@@ -11,13 +11,13 @@ class InGame:
     arrow_handle: ArrowHandle
 
 
-def init(game: 'Game | InGame'):
+def init(game: 'Game | Game'):
     game.background = pg.image.load("assets/background2.png").convert()
 
     game.player = Player()
     game.arrow_handle = ArrowHandle(game.player)
 
 
-def loop(game: 'Game | InGame'):
+def loop(game: 'Game | Game'):
     game.player.update()
     game.arrow_handle.update()

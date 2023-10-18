@@ -1,6 +1,5 @@
 import sys
 from types import ModuleType
-
 from player import *
 from ray_caster import *
 from actions import *
@@ -8,6 +7,7 @@ from sprites import *
 from drawer import *
 from dialogue import *
 from parallax import *
+from importlib import import_module
 
 
 def check_events():
@@ -17,15 +17,7 @@ def check_events():
             sys.exit()
 
 
-class InGame:
-    parallax: Parallax
-    dialogue_handler: DialogueHandler
-    sprite_handler: SpriteHandler
-    drawer: Drawer
-    action: Actions
-    ray_caster: RayCaster
-    player: Player
-    map: Map
+class Game:
     level: ModuleType
 
     def __init__(self):
@@ -34,22 +26,22 @@ class InGame:
         self.screen = pg.display.set_mode(RES, pg.RESIZABLE)
         self.clock = pg.time.Clock()
         self.time = pg.time.get_ticks()
-        self.leas_time = pg.time.get_ticks()
+        self.lest_time = pg.time.get_ticks()
         self.delta_time = 0
-        self.new_game("alpha")
+        self.new_game("base")
         # pg.mouse.set_visible
 
     def new_game(self, level: str):
-        self.level = __import__(level)
+        self.level = import_module(f".{level}", "levels")
         self.level.init(self)
 
     def update(self):
         pg.display.flip()
         self.screen.fill([0, 0, 0])  # preto
         self.clock.tick(FPS)
-        self.leas_time = self.time
+        self.lest_time = self.time
         self.time = pg.time.get_ticks()
-        self.delta_time = (self.time - self.leas_time) / 1000.0
+        self.delta_time = (self.time - self.lest_time) / 1000.0
         pg.display.set_caption(f'Cellular Odyssey   FPS: {self.clock.get_fps() :.1f}')
 
     def run(self):
@@ -60,5 +52,5 @@ class InGame:
 
 
 if __name__ == '__main__':
-    game = InGame()
+    game = Game()
     game.run()

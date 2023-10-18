@@ -6,7 +6,7 @@ from sys import exit
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from main import InGame
+    from main import Game
 
 ACTIONS = {}
 
@@ -18,7 +18,7 @@ def add_action(func):
 class Actions:
 
     def __init__(self, game):
-        self.game: InGame = game
+        self.game: Game = game
 
     def do_action(self, action, *args):
         ACTIONS[action](self.game, args)

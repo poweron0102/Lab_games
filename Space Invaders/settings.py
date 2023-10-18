@@ -7,4 +7,4 @@ HalfHeight = Height // 2
 PlayerSpeed = 5
 ArrowSpeed = -10
 
-MaxArrows = 1
+MaxArrows = 2

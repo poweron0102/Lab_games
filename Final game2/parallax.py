@@ -4,11 +4,11 @@ from settings import *
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from main import InGame
+    from main import Game
 
 
 class Parallax:
-    def __init__(self, floor, ceiling, in_game: 'InGame'):
+    def __init__(self, floor, ceiling, in_game: 'Game'):
         self.game = in_game
 
         self.x_size = (360/FOV)*RES[0]

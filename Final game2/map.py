@@ -8,7 +8,7 @@ from numba.experimental.jitclass import jitclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from main import InGame
+    from main import Game
 
 
 class Tile:
@@ -21,8 +21,11 @@ class Tile:
 
 
 class Map:
-    def __init__(self, game, world_map, tile_set, texture_set, texture_floor):
-        self.game: InGame = game
+    def __init__(
+            self, game, world_map,
+            tile_set: list[Tile], texture_set: list['None | Texture'], texture_floor: list[str]
+    ):
+        self.game: 'Game | InGame' = game
 
         self.tile_set: list[Tile] = tile_set
         self.texture_set: list[Texture] = texture_set
@@ -31,9 +34,18 @@ class Map:
         self.world_floor: list[list[int]] = world_map[1]
         self.world_ceiling: list[list[int]] = world_map[2]
 
+        # Textures for floor and ceiling
         self.texture_floor = np.empty([len(texture_floor), Texture_Res, Texture_Res, 3], dtype=np.int8)
         for tex_id, tex_name in enumerate(texture_floor):
             self.texture_floor[tex_id] = pg.surfarray.array3d(pg.image.load(f"assets/floor/{tex_name}.png"))
+
+        # Alpha textures for floor and ceiling
+        self.texture_floor_alpha = np.empty([len(texture_floor), Texture_Res, Texture_Res], dtype=np.uint8)
+        for tex_id, tex_name in enumerate(texture_floor):
+            self.texture_floor_alpha[tex_id] = pg.surfarray.pixels_alpha(
+                pg.image.load(f"assets/floor/{tex_name}.png").convert_alpha()
+            )
+        # print(self.texture_floor_alpha[0])
 
     def get_tile(self, x, y):
         x = int(x // Tile_size)

@@ -7,7 +7,7 @@ from functions import *
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from main import InGame
+    from main import Game
 
 Draw_functions = []
 Overwrites = []
@@ -39,7 +39,7 @@ def draw_order(to_draw):
 
 class Drawer:
     def __init__(self, game):
-        self.game: InGame = game
+        self.game: Game = game
         self.screen = game.screen
         self.to_draw = []
 

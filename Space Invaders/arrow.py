@@ -16,7 +16,6 @@ class ArrowHandle:
                 self.arrows.remove(arrow)
 
         if self.player.key_click(pg.K_SPACE) and len(self.arrows) < MaxArrows:
-            print(2)
             self.arrows.append(Arrow(self.player))
 
 
@@ -30,6 +29,7 @@ class Arrow(Sprite):
         self.should_be_deleted = False
 
     def collide(self, mapa: list['Shirogane']) -> bool:
+        """TODO"""
         return False
 
     def draw(self):

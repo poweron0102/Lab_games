@@ -18,8 +18,6 @@ class Player(Sprite):
         self.keys_lest = self.keys
         self.keys = pg.key.get_pressed()
 
-        #print(self.keys[pg.K_e] and not self.keys_lest[pg.K_e])
-
         if self.keys[pg.K_a] and self.x > 20:
             self.set_position(self.x - speed, self.y)
 
