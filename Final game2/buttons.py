@@ -29,14 +29,16 @@ class Button:
             x: int, y: int,
             text: str,
             font_size=25,
-            color=(216, 53, 64),
-            font="BIG_JOHN.otf",
+            color=(255, 255, 255),
+            font="Inter-Bold.ttf",
             img_base="button_base",
             img_hover="button_hover",
-            function=None, arg=None
+            func_click=None, arg_click=None,
+            func_hover=None, arg_hover=None
     ):
         self.img = None
         self.pressed = True
+        self.hover = True
 
         self.img_base = pg.image.load(f"assets/gui/{img_base}.png").convert_alpha()
         self.img_hover = pg.image.load(f"assets/gui/{img_hover}.png").convert_alpha()
@@ -46,13 +48,15 @@ class Button:
         self.width = self.img_base.get_width()
         self.height = self.img_base.get_height()
 
-        font = pg.font.Font(f"assets/fonts/{font}", font_size)
+        font = pg.font.Font(f"fonts/{font}", font_size)
         self.text_img = font.render(text, False, color)
         self.font_x = self.x + (self.width // 2 - self.text_img.get_width() // 2)
         self.font_y = self.y + (self.height // 2 - self.text_img.get_height() // 2)
 
-        self.func = function
-        self.arg = arg
+        self.func_click = func_click
+        self.arg_click = arg_click
+        self.func_hover = func_hover
+        self.arg_hover = arg_hover
 
     def update(self):
         """
@@ -65,14 +69,24 @@ class Button:
         if self.x <= mouse_x <= self.x + self.width and self.y <= mouse_y <= self.y + self.height:
             self.img = self.img_hover
             pressed = pg.mouse.get_pressed()[0]
+
             if pressed and not self.pressed:
-                if self.func:
-                    if self.arg:
-                        self.func(self.arg)
+                if self.func_click:
+                    if self.arg_click:
+                        self.func_click(self.arg_click)
                     else:
-                        self.func()
+                        self.func_click()
+            if not self.hover:
+                if self.func_hover:
+                    if self.arg_hover:
+                        self.func_hover(self.arg_hover)
+                    else:
+                        self.func_hover()
+
             self.pressed = pressed
+            self.hover = True
         else:
+            self.pressed = False
             self.img = self.img_base
 
         if self.img:

@@ -4,8 +4,7 @@ from numba import njit, typeof, jit
 from settings import *
 from functions import *
 import numpy as np
-import fast_ray_cast
-
+import functools
 
 from typing import TYPE_CHECKING
 
@@ -33,16 +32,12 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
             offset_y = -Tile_size
             offset_x = -offset_y * a_tan
             look_ns = 1
-        elif angle_ray < np.pi:  # looking down
+        else:  # looking down
             ray_y = (player_y // Tile_size) * Tile_size + Tile_size
             ray_x = player_x + ((player_y - ray_y) * a_tan)
             offset_y = Tile_size
             offset_x = -offset_y * a_tan
             look_ns = 0
-        else:  # if angle_ray == 0 or angle_ray == math.pi:
-            ray_y = player_y
-            ray_x = player_x
-            rendist = Render_dist
 
         while rendist < Render_dist:
             y = int(ray_y // Tile_size)
@@ -67,16 +62,12 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
             offset_x = Tile_size
             offset_y = -offset_x * a_tan
             look_ew = 3
-        elif np.pi / 2 < angle_ray < np.pi * 3 / 2:  # looking left
+        else:  # looking left
             ray_x = (player_x // Tile_size) * Tile_size - 0.0001
             ray_y = player_y + ((player_x - ray_x) * a_tan)
             offset_x = -Tile_size
             offset_y = -offset_x * a_tan
             look_ew = 2
-        else:
-            ray_y = player_y
-            ray_x = player_x
-            rendist = Render_dist
 
         while rendist < Render_dist:
             y = int(ray_y // Tile_size)
@@ -120,9 +111,6 @@ def cast_floor(
         floor_textures, floor_textures_alpha,
         buffer_img
 ):
-    # buffer_img = np.zeros((RenderWidth, RenderHeight, 3), dtype=np.uint8)
-    # buffer_aph = np.zeros((RenderWidth, RenderHeight), dtype=np.uint8)
-
     for id_x in range(RenderWidth):
         ray_angle = player_ang + np.deg2rad(id_x / (RenderWidth / FOV) - HalfFOV)
         sin, cos = np.sin(ray_angle), np.cos(ray_angle)
@@ -176,8 +164,8 @@ class RayCaster:
             self.game.player.y,
             self.game.player.ang,
             self.game.map.world_wall,
-        )
-        )
+        ))
+
         cast_floor(
             self.game.player.x,
             self.game.player.y,
@@ -190,7 +178,4 @@ class RayCaster:
         )
 
     def update(self):
-        if RUST:
-            self.ray_size_rust()
-        else:
-            self.ray_size_python()
+        self.ray_size_python()

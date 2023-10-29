@@ -28,7 +28,7 @@ class Game:
         self.time = pg.time.get_ticks()
         self.lest_time = pg.time.get_ticks()
         self.delta_time = 0
-        self.new_game("base")
+        self.new_game("level_selector")
         # pg.mouse.set_visible
 
     def new_game(self, level: str):

@@ -3,7 +3,6 @@ import numpy as np
 from pygame import Surface
 from settings import *
 from textures import *
-from numba.experimental.jitclass import jitclass
 
 from typing import TYPE_CHECKING
 
@@ -45,7 +44,6 @@ class Map:
             self.texture_floor_alpha[tex_id] = pg.surfarray.pixels_alpha(
                 pg.image.load(f"assets/floor/{tex_name}.png").convert_alpha()
             )
-        # print(self.texture_floor_alpha[0])
 
     def get_tile(self, x, y):
         x = int(x // Tile_size)
