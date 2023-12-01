@@ -4,22 +4,61 @@ from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.mouse import *
 from PPlay.keyboard import *
+from datetime import datetime
+
+import pickle
 
 from inimigo import *
+
+variables = {
+    'pontucao': 0,
+    'vidas': 3,
+    'vitorias': 0,
+}
+
+
+def read_pontuacao():
+    with open("pontuacao.py", "r") as f:
+        pontuacao = eval(f.read())
+    return pontuacao if pontuacao else []
+
+
+def save_pontuacao():
+    nome = input("Digite seu nome: ")
+    pontuacao = read_pontuacao()
+
+    agora = datetime.now()
+    data_formatada = agora.strftime("%d/%m/%Y")
+
+    pontuacao.append((nome, variables['pontucao'], data_formatada))
+    pontuacao.sort(key=lambda x: -x[1])
+
+    with open("pontuacao.py", "w") as f:
+        f.write(str(pontuacao[:5]))
 
 
 def menu_ranking():
     # CRIANDO A TELA
     janela = Window(1200, 600)
     janela.set_title('MENU RANKING')
+    tempo = pygame.time.Clock()
 
     # CRIANDO TECLADO
     teclado = janela.get_keyboard()
+    pont = read_pontuacao()
+    pontosstr = ""
+    for index, pontos in enumerate(pont):
+        pontosstr += f"{index+1}° {pontos[0]}: {pontos[1]} em: {pontos[2]} |-> "
+
+    cont = 0
 
     while True:
+        tempo.tick(30)
+        cont += 1
+        janela.set_title(f"MENU RANKING   {pontosstr}")
 
         if teclado.key_pressed("ESC"):
-            menu_principal()
+            return
 
         janela.update()
 
@@ -133,11 +172,15 @@ def tela_do_jogo():
     tempo = pygame.time.Clock()
     frame_mod = 0
 
-    inimigos = Inimigos(tiros)
+    inimigos = Inimigos(tiros, variables)
 
     while True:
-        tempo.tick(60 - inimigos.num_inimigos)
-        janela.set_title(f'SPACE INVADERS    FPS: {int(tempo.get_fps())}')
+        tempo.tick(60 + (variables['vitorias'] * 10) - inimigos.num_inimigos)
+        janela.set_title(f"\
+        SPACE INVADERS    \
+        FPS: {int(tempo.get_fps())}    \
+        PONTUAÇÃO: {variables['pontucao']}   \
+        VIDAS: {variables['vidas']}")
 
         frame_mod += 1
         if frame_mod >= 30:
@@ -170,13 +213,20 @@ def tela_do_jogo():
         # MOVIMENTAÇÃO DOS TIROS 
         if teclado.key_pressed("SPACE") and len(tiros) < 3 and (frame_mod == 0 or frame_mod == 10 or frame_mod == 20):
             tiro = Sprite("imagens_jogo_principal/tiro.png")
-            tiro.x = nave.x + (nave.width//2)
-            tiro.y = nave.y
+            tiro.x = nave.x + (nave.width // 2)
+            tiro.y = nave.y - 10
+            tiro.speed = -300
             tiros.append(tiro)
 
         for tiro in tiros:
-            if tiro.y > -20:
-                tiro.move_y(velocidade_tiros * janela.delta_time())
+            if -20 < tiro.y < 600:
+                tiro.move_y(tiro.speed * janela.delta_time())
+                if tiro.collided(nave):
+                    variables['vidas'] -= 1
+                    tiros.remove(tiro)
+                    if variables['vidas'] < 0:
+                        save_pontuacao()
+                        return
             else:
                 tiros.remove(tiro)
             tiro.draw()
@@ -286,4 +336,5 @@ def menu_principal():
         janela.update()
 
 
-menu_principal()
+if __name__ == '__main__':
+    menu_principal()
