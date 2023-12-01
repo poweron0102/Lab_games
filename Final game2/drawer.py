@@ -61,11 +61,12 @@ class Drawer:
 
 @njit(fastmath=FastMath)
 def render_line(
-        ray_dist, ray_id, ray_point, look,
+        ray_dist, ray_id, ray_point, look, walls_height,
         tile_texture, scale, screen
 ):
-    line_high = Tile_size * RES[0] / ray_dist
-    line_offset = (RES[1] - line_high) / 2
+    # line_high = Tile_size * RES[0] / ray_dist
+    line_high = walls_height[ray_id]
+    line_offset = (RES[1] - line_high) // 2
 
     if tile_texture is not None:
         if look == 0:  # Norte
@@ -103,6 +104,7 @@ def ray_cast(item, screen, game):
         ray_id,
         ray_point,
         look,
+        game.ray_caster.walls_height,
         tile_texture,
         SCALE if not game.player.xray else SCALE // 2,
         pg.surfarray.pixels3d(screen)

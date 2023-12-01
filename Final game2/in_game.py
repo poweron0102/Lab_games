@@ -1,7 +1,7 @@
 from main import *
 
 
-class InGame:
+class InGame(Game):
     parallax: Parallax
     dialogue_handler: DialogueHandler
     sprite_handler: SpriteHandler

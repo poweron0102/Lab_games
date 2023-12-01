@@ -1,12 +1,6 @@
-from map import Map
-from dialogue import Dialogue
-
-from time import sleep
-from sys import exit
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from main import Game
+    from main import *
 
 ACTIONS = {}
 
@@ -18,7 +12,7 @@ def add_action(func):
 class Actions:
 
     def __init__(self, game):
-        self.game: Game = game
+        self.game: InGame = game
 
     def do_action(self, action, *args):
         ACTIONS[action](self.game, args)

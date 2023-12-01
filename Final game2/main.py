@@ -6,7 +6,10 @@ from actions import *
 from sprites import *
 from drawer import *
 from dialogue import *
+from textures import *
 from parallax import *
+from in_game import *
+from map import *
 from importlib import import_module
 
 
@@ -28,7 +31,7 @@ class Game:
         self.time = pg.time.get_ticks()
         self.lest_time = pg.time.get_ticks()
         self.delta_time = 0
-        self.new_game("level_selector")
+        self.new_game("base")
         # pg.mouse.set_visible
 
     def new_game(self, level: str):

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class Sprite:
     def __init__(self, game, name, x, y, scale=0.5, shift=0.07, action=None):
-        self.game: Game = game
+        self.game: InGame = game
         self.player = game.player
 
         self.x = x

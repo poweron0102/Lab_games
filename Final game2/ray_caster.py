@@ -14,12 +14,8 @@ if TYPE_CHECKING:
 
 
 @njit(fastmath=FastMath)
-def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
-    # (0, (tamanho * math.cos(player_ang - angle_ray), contador, ponto, look))
-    # rays = np.empty(RES[0] // SCALE, dtype=np.dtype( [np.uint8, [float, np.uint16, [float, float], np.uint8]] ))
-    # rays = [None] * (RES[0] // SCALE)
+def cast_walls(player_x, player_y, player_ang, world_map, is_render, walls_height):
     rays = []
-    offset_x = offset_y = 0
     angle_ray = angle_to_fist(player_ang - np.deg2rad(FOV) / 2)
 
     for contador in range(RES[0] // SCALE):
@@ -96,7 +92,9 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
             look = look_ew
 
         # rays[contador] = (0, (tamanho * math.cos(player_ang - angle_ray), contador, ponto, look))
-        rays.append((0, (tamanho * math.cos(player_ang - angle_ray), contador, ponto, angle_ray, look)))
+        ray_dist = tamanho * math.cos(player_ang - angle_ray)
+        rays.append((0, (ray_dist, contador, ponto, angle_ray, look)))
+        walls_height[contador] = Tile_size * RES[0] / ray_dist
 
         angle_ray += math.radians(FOV) / (RES[0] // SCALE)
         angle_ray = angle_to_fist(angle_ray)
@@ -107,6 +105,7 @@ def cast_walls(player_x, player_y, player_ang, world_map, is_render=(1, 2, 3)):
 @njit(fastmath=FastMath)
 def cast_floor(
         player_x, player_y, player_ang,
+        walls_height,
         world_floor, world_ceiling,
         floor_textures, floor_textures_alpha,
         buffer_img
@@ -116,7 +115,10 @@ def cast_floor(
         sin, cos = np.sin(ray_angle), np.cos(ray_angle)
         fish = np.cos(np.deg2rad(id_x / (RenderWidth / FOV) - HalfFOV))
 
-        for id_y in range(HalfRenderHeight):
+        c_height = HalfRenderHeight - walls_height[id_x//2]//2
+        #if c_height > HalfRenderHeight:
+        #    c_height = HalfRenderHeight
+        for id_y in range(c_height):
             n = Tile_size * (HalfRenderWidth / (HalfRenderHeight - id_y)) / fish
 
             ray_x = (player_x + (n * cos))
@@ -140,8 +142,10 @@ def cast_floor(
 
 class RayCaster:
     def __init__(self, game):
-        self.game: 'Game | InGame' = game
+        self.game: InGame = game
+        self.walls_height = np.zeros(RES[0] // SCALE, dtype=np.uint16)
 
+    """
     def ray_size_rust(self):
         self.game.drawer.to_draw.extend(fast_ray_cast.cast(
             NumThreads,
@@ -157,6 +161,7 @@ class RayCaster:
             self.game.map.world_wall
         ))
         # print(self.rays)
+    """
 
     def ray_size_python(self):
         self.game.drawer.to_draw.extend(cast_walls(
@@ -164,12 +169,15 @@ class RayCaster:
             self.game.player.y,
             self.game.player.ang,
             self.game.map.world_wall,
+            self.game.map.tiles_to_render,
+            self.walls_height
         ))
 
         cast_floor(
             self.game.player.x,
             self.game.player.y,
             self.game.player.ang,
+            self.walls_height,
             self.game.map.world_floor,
             self.game.map.world_ceiling,
             self.game.map.texture_floor,

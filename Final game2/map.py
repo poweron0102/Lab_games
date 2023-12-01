@@ -7,7 +7,7 @@ from textures import *
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from main import Game
+    from main import *
 
 
 class Tile:
@@ -24,9 +24,10 @@ class Map:
             self, game, world_map,
             tile_set: list[Tile], texture_set: list['None | Texture'], texture_floor: list[str]
     ):
-        self.game: 'Game | InGame' = game
+        self.game: 'InGame' = game
 
         self.tile_set: list[Tile] = tile_set
+        self.tiles_to_render: list[int] = [tile_id for tile_id, tile in enumerate(tile_set) if tile.render]
         self.texture_set: list[Texture] = texture_set
 
         self.world_wall: list[list[int]] = world_map[0]
@@ -52,6 +53,9 @@ class Map:
             return self.world_wall[y][x]
         else:
             return 0
+
+    def update_tiles_to_render(self):
+        self.tiles_to_render: list[int] = [tile_id for tile_id, tile in enumerate(self.tile_set) if tile.render]
 
     def is_wall(self, x, y) -> bool:
         return self.tile_set[self.get_tile(x, y)].is_wall
